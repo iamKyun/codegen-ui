@@ -1,59 +1,96 @@
 <template>
-  <n-flex justify="center" align="center" class="main" vertical gap="large">
-    <n-card :bordered="false" style="width: 1200px;height: 800px">
-      <template #header>
-        {{ curStepText }}
-      </template>
-      <div v-show="curStep === 0">
-        <n-radio-group v-model:value="mode" name="mode">
-          <n-space>
-            <n-radio v-for="m in modes" :key="m.value" :value="m.value">
-              {{ m.label }}
-            </n-radio>
-          </n-space>
-        </n-radio-group>
-      </div>
-      <div v-show="curStep === 1">
-
-      </div>
-    </n-card>
-    <n-flex justify="center" align="center" gap="middle">
-      <n-button type="primary" @click="nextStep" :disabled="curStep>=maxStep">下一步</n-button>
-      <n-button @click="previousStep" :disabled="curStep<1">上一步</n-button>
+  <div class="main">
+    <n-flex justify="center" align="center" vertical gap="large">
+      <n-card class="card" :bordered="false">
+        <template #header>
+          {{ curStepText }}
+        </template>
+        <select-mode v-show="curStep === 'selectMode'" v-model="selectedMode" />
+        <select-table v-if="curStep === 'selectMainTable'" :multiple="false" v-model="selectedMainTables" />
+        <select-table v-if="curStep === 'selectSubTable'" :multiple="true" v-model="selectedSubTables" />
+        <config-main-table v-if="curStep === 'configMainTable'" :tableName="selectedMainTables[0]" />
+      </n-card>
+      <n-flex justify="center" align="center" gap="middle">
+        <n-button type="primary" @click="nextStep" :disabled="curStepCount>=steps.length-1">下一步</n-button>
+        <n-button @click="previousStep" :disabled="curStepCount<1">上一步</n-button>
+      </n-flex>
     </n-flex>
-  </n-flex>
-  <n-button>123</n-button>
+  </div>
 </template>
 
 <script setup>
 import {ref} from 'vue'
+import SelectMode from '@/components/SelectMode.vue'
+import {useMessage} from 'naive-ui'
+import SelectTable from '@/components/SelectTable.vue'
+import ConfigMainTable from '@/components/ConfigMainTable.vue'
 
-const curStep = ref(0)
-const maxStep = 3
-const stepText = ['选择模式', '选择数据表', '选择模式3', '选择模式4']
+const message = useMessage()
+const curStep = ref('selectMode')
+const curStepCount = ref(0)
+const stepText = {
+  selectMode: '选择模式',
+  selectMainTable: '选择主表',
+  selectSubTables: '选择子表',
+  configMainTable: '主表属性配置',
+}
+const modeSteps = {
+  'single': ['selectMode', 'selectMainTable', 'configMainTable'],
+  'oneToMany': ['selectMode', 'selectMainTable', 'selectSubTables', 'configMainTable'],
+  'entity': ['selectMode', 'selectMainTable'],
+}
+const steps = ref(modeSteps.single)
 const curStepText = computed(() => stepText[curStep.value])
-const mode = ref('single')
-const modes = [
-  {value: 'single', label: '单表'},
-  {value: 'oneToMany', label: '一对多'},
-  {value: 'entity', label: '仅实体类'},
-]
+
+// 各阶段数据
+const selectedMode = ref('single')
+const selectedMainTables = ref([])
+const selectedSubTables = ref([])
+
 const nextStep = () => {
-  curStep.value++
-  if (curStep.value >= maxStep) {
-    curStep.value = maxStep
+  switch (curStep.value) {
+    case 'selectMode':
+      if (!selectedMode.value) {
+        message.error('请选择模式')
+        return
+      }
+      steps.value = modeSteps[selectedMode.value]
+      console.log(steps.value)
+      break
+    case 'selectMainTable':
+      if (!selectedMainTables.value.length) {
+        message.error('请选择主表')
+        return
+      }
+      break
+    case 'configMainTable':
+      if (!selectedSubTables.value.length) {
+        message.error('请选择子表')
+        return
+      }
+      break
+  }
+  if (curStepCount.value < steps.value.length) {
+    curStep.value = steps.value[++curStepCount.value]
   }
 }
-const previousStep = () => {
-  curStep.value--
-}
-</script>
 
+const previousStep = () => {
+  curStep.value = steps.value[--curStepCount.value]
+}
+
+</script>
 
 <style scoped>
 .main {
   height: 100vh;
   width: 100vw;
   background: #f3f3f3;
+}
+
+.card {
+  height: calc(100vh - 100px);
+  width: 80vw;
+  margin: 20px 0;
 }
 </style>

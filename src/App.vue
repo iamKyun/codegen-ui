@@ -1,10 +1,16 @@
+<template>
+  <n-config-provider :locale="zhCN" :date-locale="dateZhCN">
+    <n-message-provider>
+      <Home />
+    </n-message-provider>
+  </n-config-provider>
+</template>
+
 <script setup>
 import Home from './components/Home.vue'
-</script>
+import { zhCN, dateZhCN } from 'naive-ui'
 
-<template>
-  <Home />
-</template>
+</script>
 
 <style scoped>
 </style>
