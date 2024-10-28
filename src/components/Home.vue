@@ -8,7 +8,7 @@
         <select-mode v-show="curStep === 'selectMode'" v-model="selectedMode" />
         <select-table v-if="curStep === 'selectMainTable'" :multiple="false" v-model="selectedMainTables" />
         <select-table v-if="curStep === 'selectSubTable'" :multiple="true" v-model="selectedSubTables" />
-        <config-main-table v-if="curStep === 'configMainTable'" :tableName="selectedMainTables[0]" />
+        <config-main-table v-if="curStep === 'configMainTable'" v-model="mainTableConfig" />
       </n-card>
       <n-flex justify="center" align="center" gap="middle">
         <n-button type="primary" @click="nextStep" :disabled="curStepCount>=steps.length-1">下一步</n-button>
@@ -32,10 +32,11 @@ const stepText = {
   selectMode: '选择模式',
   selectMainTable: '选择主表',
   selectSubTables: '选择子表',
-  configMainTable: '主表属性配置',
+  configMainTable: '主表配置',
+  configMainTableOrder: '页面字段顺序调整',
 }
 const modeSteps = {
-  'single': ['selectMode', 'selectMainTable', 'configMainTable'],
+  'single': ['selectMode', 'selectMainTable', 'configMainTable', 'configMainTableOrder'],
   'oneToMany': ['selectMode', 'selectMainTable', 'selectSubTables', 'configMainTable'],
   'entity': ['selectMode', 'selectMainTable'],
 }
@@ -46,6 +47,7 @@ const curStepText = computed(() => stepText[curStep.value])
 const selectedMode = ref('single')
 const selectedMainTables = ref([])
 const selectedSubTables = ref([])
+const mainTableConfig = ref({})
 
 const nextStep = () => {
   switch (curStep.value) {
@@ -62,12 +64,10 @@ const nextStep = () => {
         message.error('请选择主表')
         return
       }
+      mainTableConfig.value = {general: {tableName: selectedMainTables.value[0]}}
       break
     case 'configMainTable':
-      if (!selectedSubTables.value.length) {
-        message.error('请选择子表')
-        return
-      }
+      console.log(mainTableConfig.value)
       break
   }
   if (curStepCount.value < steps.value.length) {

@@ -1,168 +1,36 @@
 <template>
-  <n-data-table
-      ref="table"
-      :columns="columns"
-      :data="data"
-      :pagination="false"
-      max-height="calc(100vh - 280px)"
-      :scroll-x="1300"
-  />
-  <n-float-button position="absolute"
-                  top="14px"
-                  right="30px"
-                  shape="square"
-                  type="primary"
-                  width="140"
-                  @click="handleAdd">
-    <n-flex align="center" :wrap="false">
-      <n-icon>
-        <Add />
-      </n-icon>
-      <span style="font-size: 14px;">
+  <n-space vertical :size="12">
+    <n-space>
+      <n-button type="info" @click="handlegeneralConfig">
+        <template #icon>
+          <n-icon>
+            <Cog />
+          </n-icon>
+        </template>
+        通用配置
+      </n-button>
+      <n-button type="primary" @click="handleAdd">
+        <template #icon>
+          <n-icon>
+            <Add />
+          </n-icon>
+        </template>
         添加虚拟字段
-      </span>
-    </n-flex>
-  </n-float-button>
+      </n-button>
+    </n-space>
+    <n-data-table
+        ref="table"
+        :columns="columns"
+        :data="data"
+        :pagination="false"
+        max-height="calc(100vh - 280px)"
+        :scroll-x="1300"
+    />
+  </n-space>
+
   <n-drawer :show="showConfig" :width="700" @update:show="onConfigUpdateShow">
     <n-drawer-content :title="`配置 [ ${formValue.attrName??''} ] ( ${formValue.attrComment??''} )`" closable>
-      <n-form
-          ref="formRef"
-          :model="formValue"
-          :rules="rules"
-          label-placement="left"
-          label-width="120"
-          require-mark-placement="right-hanging"
-      >
-        <n-form-item label="属性名" path="attrName">
-          <n-input v-model:value="formValue.attrName" />
-        </n-form-item>
-        <n-form-item label="备注" path="attrComment">
-          <n-input v-model:value="formValue.attrComment" />
-        </n-form-item>
-        <n-form-item path="isShowOnTable">
-          <template #label>
-            <label-with-tooltip label="列表展示" tooltip="是否在列表页面展示该字段" />
-          </template>
-          <n-switch v-model:value="formValue.isShowOnTable">
-            <template #checked>是</template>
-            <template #unchecked>否</template>
-          </n-switch>
-        </n-form-item>
-        <n-form-item path="isShowOnView">
-          <template #label>
-            <label-with-tooltip label="查看展示" tooltip="是否在查看表单时展示该字段" />
-          </template>
-          <n-switch v-model:value="formValue.isShowOnView">
-            <template #checked>是</template>
-            <template #unchecked>否</template>
-          </n-switch>
-        </n-form-item>
-        <n-form-item path="isShowOnEdit">
-          <template #label>
-            <label-with-tooltip label="编辑展示" tooltip="是否在编辑表单时展示该字段" />
-          </template>
-          <n-switch v-model:value="formValue.isShowOnEdit">
-            <template #checked>是</template>
-            <template #unchecked>否</template>
-          </n-switch>
-        </n-form-item>
-        <n-form-item path="dataType">
-          <template #label>
-            <label-with-tooltip label="数据类型" tooltip="前端列表和表单的字段录入和展示方式" />
-          </template>
-          <n-select v-model:value="formValue.dataType" :options="options" />
-        </n-form-item>
-
-        <n-divider>查询配置</n-divider>
-        <n-form-item path="isSearch">
-          <template #label>
-            <label-with-tooltip label="用于搜索" tooltip="是否用于列表搜索" />
-          </template>
-          <n-switch v-model:value="formValue.isSearch">
-            <template #checked>是</template>
-            <template #unchecked>否</template>
-          </n-switch>
-        </n-form-item>
-        <n-form-item path="isFuzzySearch" v-if="['input','textarea'].includes(formValue.dataType)">
-          <template #label>
-            <label-with-tooltip label="模糊搜索" tooltip="like '%**%'" />
-          </template>
-          <n-switch v-model:value="formValue.isFuzzySearch" :default-value="true">
-            <template #checked>是</template>
-            <template #unchecked>否</template>
-          </n-switch>
-        </n-form-item>
-
-        <n-divider>表单配置</n-divider>
-        <n-form-item path="isRequired">
-          <template #label>
-            <label-with-tooltip label="必填项" tooltip="编辑表单时必填" />
-          </template>
-          <n-switch v-model:value="formValue.isRequired">
-            <template #checked>是</template>
-            <template #unchecked>否</template>
-          </n-switch>
-        </n-form-item>
-        <n-form-item path="maxLength" v-if="['input','textarea'].includes(formValue.dataType)">
-          <template #label>
-            <label-with-tooltip label="最大长度" tooltip="最大长度" />
-          </template>
-          <n-input-number v-model:value="formValue.maxLength" />
-        </n-form-item>
-        <n-form-item path="dictCode" v-if="formValue.dataType === 'dictSelect'">
-          <template #label>
-            <label-with-tooltip label="字典编码" tooltip="自动渲染字典编码" />
-          </template>
-          <n-input v-model:value="formValue.dictCode" />
-        </n-form-item>
-        <n-form-item path="dateFormat" v-if="formValue.dataType === 'date'">
-          <template #label>
-            <label-with-tooltip label="日期格式" tooltip="例如YYYY-MM-DD HH:hh:ss" />
-          </template>
-          <n-input v-model:value="formValue.dateFormat" />
-        </n-form-item>
-        <n-form-item path="selectOptions" v-if="formValue.dataType === 'select'">
-          <template #label>
-            <label-with-tooltip label="下拉选项" tooltip="键值对选项" />
-          </template>
-          <n-dynamic-input
-              v-model:value="formValue.selectOptions"
-              preset="pair"
-              key-placeholder="value"
-              value-placeholder="label"
-          />
-        </n-form-item>
-
-        <n-form-item path="attachmentRelateType" v-if="formValue.dataType === 'attachment'">
-          <template #label>
-            <label-with-tooltip label="关联类型" tooltip="附件表的relate_type，例如 WORK_DOC" />
-          </template>
-          <n-input v-model:value="formValue.attachmentRelateType" />
-        </n-form-item>
-        <n-form-item path="attachmentMaxSize" v-if="formValue.dataType === 'attachment'">
-          <template #label>
-            <label-with-tooltip label="最大文件数" tooltip="数字" />
-          </template>
-          <n-input-number v-model:value="formValue.attachmentMaxSize" />
-        </n-form-item>
-        <n-form-item path="attachmentAllowType" v-if="formValue.dataType === 'attachment'">
-          <template #label>
-            <label-with-tooltip label="允许的格式" tooltip="例如：.doc,.xls" />
-          </template>
-          <n-input v-model:value="formValue.attachmentAllowType" />
-        </n-form-item>
-
-        <n-divider>特殊配置</n-divider>
-        <n-form-item path="isLogicDel">
-          <template #label>
-            <label-with-tooltip label="逻辑删除" tooltip="在实体类上加上@TableLogic，要有对应的表字段才会生效" />
-          </template>
-          <n-switch v-model:value="formValue.isShowOnTable">
-            <template #checked>是</template>
-            <template #unchecked>否</template>
-          </n-switch>
-        </n-form-item>
-      </n-form>
+      <config-form ref="formRef" v-model="formValue" :data="data" />
       <template #footer v-if="formValue.from === 'add'">
         <n-popconfirm @positive-click="()=>handleDelete(formValue.key)">
           <template #trigger>
@@ -173,18 +41,25 @@
       </template>
     </n-drawer-content>
   </n-drawer>
+
+  <n-drawer v-model:show="showGeneralConfig" :width="700">
+    <n-drawer-content title="通用配置" closable>
+      <table-general-config-form ref="tableFormRef" v-model="modelValue.general" :data="data" />
+    </n-drawer-content>
+  </n-drawer>
 </template>
 
 <script setup lang="jsx">
 import axios from 'axios'
-import {NButton, NIcon, NPopconfirm, NSwitch, useMessage} from 'naive-ui'
+import {NButton, NIcon, NPopconfirm, useMessage} from 'naive-ui'
 import {toCamelCase, uuidv4} from '@/utils/StringUtils.js'
-import {Add} from '@vicons/ionicons5'
+import {Add, Cog} from '@vicons/ionicons5'
 import {createSwitchForTable, createTitleWithTooltip} from '@/utils/VueUtils.jsx'
-import LabelWithTooltip from '@/components/tool/LabelWithTooltip.vue'
+import ConfigForm from '@/components/ConfigForm.vue'
+import {options} from '@/utils/Constants.js'
+import TableGeneralConfigForm from '@/components/TableGeneralConfigForm.vue'
 
-const props = defineProps({tableName: String})
-
+const modelValue = defineModel()
 const columns = [
   {
     title: '属性名',
@@ -271,42 +146,6 @@ const columns = [
     },
   },
 ]
-const rules = {
-  attrName: {
-    required: true,
-    validator(rule, value) {
-      if (!value) {
-        return new Error('需要属性名')
-      } else if (!/^[a-zA-Z_][a-zA-Z0-9_]*$/.test(value)) {
-        return new Error('不符合规则，只能字母和数字，首位不能是数字')
-      } else if (data.value.some(item => item.attrName === value && item.key !== formValue.value.key)) {
-        return new Error('属性名重复')
-      }
-      return true
-    },
-    trigger: ['blur', 'input'],
-  },
-  attrComment: {
-    required: true,
-    trigger: ['blur', 'input'],
-    message: '请输入',
-  },
-  dictCode: {
-    required: true,
-    trigger: ['blur', 'input'],
-    message: '请输入',
-  },
-}
-const options = [
-  {label: '文本框', value: 'input'},
-  {label: '大文本框', value: 'textarea'},
-  {label: '数字输入', value: 'number'},
-  {label: '布尔值（开关）', value: 'boolean'},
-  {label: '日期选择', value: 'date'},
-  {label: '下拉选择', value: 'select'},
-  {label: '字典下拉选择', value: 'dictSelect'},
-  {label: '附件上传', value: 'attachment'},
-]
 
 const optionMap = options.reduce((map, option) => {
   map[option.value] = option.label
@@ -314,7 +153,10 @@ const optionMap = options.reduce((map, option) => {
 }, {})
 
 const showConfig = ref(false)
+const showGeneralConfig = ref(false)
+
 const formValue = ref(null)
+
 const handleConfig = (row) => {
   formValue.value = row
   showConfig.value = true
@@ -341,6 +183,11 @@ const onConfigUpdateShow = (show) => {
     })
   }
 }
+
+const handlegeneralConfig = () => {
+  showGeneralConfig.value = true
+}
+
 const handleAdd = () => {
   const newRow = {
     key: uuidv4(),
@@ -354,7 +201,7 @@ const handleAdd = () => {
 const data = ref([])
 
 onMounted(async() => {
-  const res = await axios.get('/api/columns', {params: {tableName: props.tableName}})
+  const res = await axios.get('/api/columns', {params: {tableName: modelValue.value.general.tableName}})
   const columns = res.data
   console.log(columns)
   data.value = columns.map(item => {
@@ -367,6 +214,7 @@ onMounted(async() => {
       from: 'table',
     }
   })
+  modelValue.value.data = data.value
 })
 </script>
 
