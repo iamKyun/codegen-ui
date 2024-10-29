@@ -104,24 +104,10 @@ const columns = [
     },
   },
   {
-    title: createTitleWithTooltip('查看展示', '是否在查看表单时展示该字段'),
-    key: 'isShowOnView',
+    title: createTitleWithTooltip('表单展示', '是否在编辑表单时展示该字段'),
+    key: 'isShowOnForm',
     render(row) {
-      return createSwitchForTable(row, 'isShowOnView')
-    },
-  },
-  {
-    title: createTitleWithTooltip('编辑展示', '是否在编辑表单时展示该字段'),
-    key: 'isShowOnEdit',
-    render(row) {
-      return createSwitchForTable(row, 'isShowOnEdit')
-    },
-  },
-  {
-    title: createTitleWithTooltip('逻辑删除字段', '在实体类上加上@TableLogic'),
-    key: 'isLogicDel',
-    render(row) {
-      return createSwitchForTable(row, 'isLogicDel')
+      return createSwitchForTable(row, 'isShowOnForm')
     },
   },
   {

@@ -22,20 +22,11 @@
         <template #unchecked>否</template>
       </n-switch>
     </n-form-item>
-    <n-form-item path="isShowOnView">
+    <n-form-item path="isShowOnForm">
       <template #label>
-        <label-with-tooltip label="查看展示" tooltip="是否在查看表单时展示该字段" />
+        <label-with-tooltip label="表单展示" tooltip="是否在编辑表单时展示该字段" />
       </template>
-      <n-switch v-model:value="formValue.isShowOnView">
-        <template #checked>是</template>
-        <template #unchecked>否</template>
-      </n-switch>
-    </n-form-item>
-    <n-form-item path="isShowOnEdit">
-      <template #label>
-        <label-with-tooltip label="编辑展示" tooltip="是否在编辑表单时展示该字段" />
-      </template>
-      <n-switch v-model:value="formValue.isShowOnEdit">
+      <n-switch v-model:value="formValue.isShowOnForm">
         <template #checked>是</template>
         <template #unchecked>否</template>
       </n-switch>
@@ -45,6 +36,24 @@
         <label-with-tooltip label="数据类型" tooltip="前端列表和表单的字段录入和展示方式" />
       </template>
       <n-select v-model:value="formValue.dataType" :options="options" />
+    </n-form-item>
+    <n-form-item path="dictCode" v-if="['dictSelect','dictRadio'].includes(formValue.dataType)">
+      <template #label>
+        <label-with-tooltip label="字典编码" tooltip="自动渲染字典编码" />
+      </template>
+      <n-input v-model:value="formValue.dictCode" />
+    </n-form-item>
+
+    <n-form-item path="selectOptions" v-if="['select','radio'].includes(formValue.dataType)">
+      <template #label>
+        <label-with-tooltip label="下拉选项" tooltip="键值对选项" />
+      </template>
+      <n-dynamic-input
+          v-model:value="formValue.selectOptions"
+          preset="pair"
+          key-placeholder="value"
+          value-placeholder="label"
+      />
     </n-form-item>
 
     <n-divider>查询配置</n-divider>
@@ -85,12 +94,6 @@
       <n-input-number v-model:value="formValue.maxLength" />
     </n-form-item>
 
-    <n-form-item path="dictCode" v-if="formValue.dataType === 'dictSelect'">
-      <template #label>
-        <label-with-tooltip label="字典编码" tooltip="自动渲染字典编码" />
-      </template>
-      <n-input v-model:value="formValue.dictCode" />
-    </n-form-item>
 
     <n-form-item path="dateFormat" v-if="formValue.dataType === 'date'">
       <template #label>
@@ -98,17 +101,7 @@
       </template>
       <n-input v-model:value="formValue.dateFormat" />
     </n-form-item>
-    <n-form-item path="selectOptions" v-if="formValue.dataType === 'select'">
-      <template #label>
-        <label-with-tooltip label="下拉选项" tooltip="键值对选项" />
-      </template>
-      <n-dynamic-input
-          v-model:value="formValue.selectOptions"
-          preset="pair"
-          key-placeholder="value"
-          value-placeholder="label"
-      />
-    </n-form-item>
+
 
     <n-form-item path="attachmentRelateType" v-if="formValue.dataType === 'attachment'">
       <template #label>

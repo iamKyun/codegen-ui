@@ -24,14 +24,26 @@
       <template #label>
         <label-with-tooltip label="通用分组Code" tooltip="分组表的Code，用来标识不同业务，如 MODEL_GROUP" />
       </template>
-      <n-input v-model:value="formValue.dictCode" />
+      <n-input v-model:value="formValue.groupCode" />
     </n-form-item>
-    <n-form-item path="relateField" v-if="formValue.isUseCommonGroup">
+
+    <n-form-item path="groupRelateId" v-if="formValue.isUseCommonGroup">
       <template #label>
         <label-with-tooltip label="分组关联字段" tooltip="表里用来关联分组ID的字段" />
       </template>
       <n-select filterable v-model:value="formValue.groupRelateId" :options="options" />
     </n-form-item>
+
+    <n-form-item path="isShowNum">
+      <template #label>
+        <label-with-tooltip label="列表展示序号" tooltip="列表展示序号" />
+      </template>
+      <n-switch v-model:value="formValue.isShowNum">
+        <template #checked>是</template>
+        <template #unchecked>否</template>
+      </n-switch>
+    </n-form-item>
+
     <n-form-item path="isLogicDel">
       <template #label>
         <label-with-tooltip label="是否逻辑删除" tooltip="在实体类上加上@TableLogic，要有对应的表字段才会生效" />
@@ -41,6 +53,7 @@
         <template #unchecked>否</template>
       </n-switch>
     </n-form-item>
+
     <n-form-item path="logicDelField" v-if="formValue.isLogicDel">
       <template #label>
         <label-with-tooltip label="逻辑删除字段" tooltip="表里用来关联逻辑删除字段的字段" />

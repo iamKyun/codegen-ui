@@ -9,6 +9,7 @@
         <select-table v-if="curStep === 'selectMainTable'" :multiple="false" v-model="selectedMainTables" />
         <select-table v-if="curStep === 'selectSubTable'" :multiple="true" v-model="selectedSubTables" />
         <config-main-table v-if="curStep === 'configMainTable'" v-model="mainTableConfig" />
+        <config-sort v-if="curStep === 'configMainTableOrder'" v-model="mainTableOrderConfig" />
       </n-card>
       <n-flex justify="center" align="center" gap="middle">
         <n-button type="primary" @click="nextStep" :disabled="curStepCount>=steps.length-1">下一步</n-button>
@@ -24,6 +25,7 @@ import SelectMode from '@/components/SelectMode.vue'
 import {useMessage} from 'naive-ui'
 import SelectTable from '@/components/SelectTable.vue'
 import ConfigMainTable from '@/components/ConfigMainTable.vue'
+import ConfigSort from '@/components/ConfigSort.vue'
 
 const message = useMessage()
 const curStep = ref('selectMode')
@@ -48,6 +50,7 @@ const selectedMode = ref('single')
 const selectedMainTables = ref([])
 const selectedSubTables = ref([])
 const mainTableConfig = ref({})
+const mainTableOrderConfig = ref({})
 
 const nextStep = () => {
   switch (curStep.value) {
@@ -68,6 +71,31 @@ const nextStep = () => {
       break
     case 'configMainTable':
       console.log(mainTableConfig.value)
+      const orderConfig = {
+        search: [],
+        table: [],
+        form: [],
+      }
+
+      mainTableConfig.value.data.forEach(item => {
+        const {attrName, attrComment, isShowOnTable, isSearch, isShowOnForm} = item
+
+        if (isSearch) {
+          orderConfig.search.push({attrName, attrComment})
+        }
+
+        if (isShowOnTable) {
+          orderConfig.table.push({attrName, attrComment})
+        }
+
+        if (isShowOnForm) {
+          orderConfig.form.push({attrName, attrComment})
+        }
+      })
+
+      mainTableOrderConfig.value = orderConfig
+      break
+    case 'configMainTableOrder':
       break
   }
   if (curStepCount.value < steps.value.length) {
