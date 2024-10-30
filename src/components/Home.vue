@@ -1,22 +1,23 @@
 <template>
-  <div class="main">
-    <n-flex justify="center" align="center" vertical gap="large">
-      <n-card class="card" :bordered="false">
-        <template #header>
-          {{ curStepText }}
-        </template>
-        <select-mode v-show="curStep === 'selectMode'" v-model="selectedMode" />
-        <select-table v-if="curStep === 'selectMainTable'" :multiple="false" v-model="selectedMainTables" />
-        <select-table v-if="curStep === 'selectSubTable'" :multiple="true" v-model="selectedSubTables" />
-        <config-main-table v-if="curStep === 'configMainTable'" v-model="mainTableConfig" />
-        <config-sort v-if="curStep === 'configMainTableOrder'" v-model="mainTableOrderConfig" />
-      </n-card>
-      <n-flex justify="center" align="center" gap="middle">
-        <n-button type="primary" @click="nextStep" :disabled="curStepCount>=steps.length-1">下一步</n-button>
-        <n-button @click="previousStep" :disabled="curStepCount<1">上一步</n-button>
+  <n-layout class="main">
+    <n-layout-header bordered>
+      <n-flex justify="space-between" align="center">
+        <n-h2>{{ curStepText }}</n-h2>
+        <n-flex justify="center" align="center" gap="middle">
+          <n-button type="primary" @click="nextStep" :disabled="curStepCount>=steps.length-1">下一步</n-button>
+          <n-button @click="previousStep" :disabled="curStepCount<1">上一步</n-button>
+        </n-flex>
       </n-flex>
-    </n-flex>
-  </div>
+    </n-layout-header>
+    <n-layout-content bordered content-style="padding: 20px;">
+      <select-mode v-show="curStep === 'selectMode'" v-model="selectedMode" />
+      <select-table v-if="curStep === 'selectMainTable'" :multiple="false" v-model="selectedMainTables" />
+      <select-table v-if="curStep === 'selectSubTable'" :multiple="true" v-model="selectedSubTables" />
+      <!--        <config-main-table v-if="curStep === 'configMainTable'" v-model="mainTableConfig" />-->
+      <config-page v-if="curStep === 'configMainTable'" v-model="pageConfig" />
+      <config-sort v-if="curStep === 'configMainTableOrder'" v-model="mainTableOrderConfig" />
+    </n-layout-content>
+  </n-layout>
 </template>
 
 <script setup>
@@ -24,7 +25,6 @@ import {ref} from 'vue'
 import SelectMode from '@/components/SelectMode.vue'
 import {useMessage} from 'naive-ui'
 import SelectTable from '@/components/SelectTable.vue'
-import ConfigMainTable from '@/components/ConfigMainTable.vue'
 import ConfigSort from '@/components/ConfigSort.vue'
 
 const message = useMessage()
@@ -50,6 +50,7 @@ const selectedMode = ref('single')
 const selectedMainTables = ref([])
 const selectedSubTables = ref([])
 const mainTableConfig = ref({})
+const pageConfig = ref({})
 const mainTableOrderConfig = ref({})
 
 const nextStep = () => {
@@ -68,6 +69,7 @@ const nextStep = () => {
         return
       }
       mainTableConfig.value = {general: {tableName: selectedMainTables.value[0]}}
+      pageConfig.value = {general: {tableName: selectedMainTables.value[0]}}
       break
     case 'configMainTable':
       console.log(mainTableConfig.value)
@@ -112,13 +114,6 @@ const previousStep = () => {
 <style scoped>
 .main {
   height: 100vh;
-  width: 100vw;
-  background: #f3f3f3;
-}
-
-.card {
-  height: calc(100vh - 100px);
-  width: 80vw;
-  margin: 20px 0;
+  padding: 20px;
 }
 </style>

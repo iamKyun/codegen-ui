@@ -14,7 +14,7 @@
       :pagination="false"
       :row-key="(row) => row.tableName"
       :row-props="rowProps"
-      max-height="calc(100vh - 280px)"
+      max-height="calc(100vh - 240px)"
   />
 </template>
 
@@ -22,7 +22,6 @@
 import {onMounted,defineProps} from 'vue'
 import {Search} from '@vicons/ionicons5'
 import axios from 'axios'
-import {NButton} from 'naive-ui'
 
 const props = defineProps(
     {multiple: {type: Boolean, default: false}}
