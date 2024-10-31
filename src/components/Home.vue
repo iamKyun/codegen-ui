@@ -26,6 +26,7 @@ import SelectMode from '@/components/SelectMode.vue'
 import {useMessage} from 'naive-ui'
 import SelectTable from '@/components/SelectTable.vue'
 import ConfigSort from '@/components/ConfigSort.vue'
+import ConfigPage from '@/components/ConfigPage.vue'
 
 const message = useMessage()
 const curStep = ref('selectMode')
@@ -69,7 +70,7 @@ const nextStep = () => {
         return
       }
       mainTableConfig.value = {general: {tableName: selectedMainTables.value[0]}}
-      pageConfig.value = {general: {tableName: selectedMainTables.value[0]}}
+      pageConfig.value = {tableName: selectedMainTables.value[0]}
       break
     case 'configMainTable':
       console.log(mainTableConfig.value)
