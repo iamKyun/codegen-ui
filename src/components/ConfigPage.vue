@@ -5,9 +5,9 @@
                     content-class="field-container"
                     content-style="width: 240px;padding-right:20px;">
       <draggable
-          class="dragArea list-group"
           :list="attrs"
-          :group="{ name: 'people', pull: 'clone', put: false }"
+          :group="{ name: 'attr', pull: 'clone', put: false }"
+          :clone="clone"
           @change="log"
           item-key="id"
       >
@@ -20,6 +20,7 @@
     </n-layout-sider>
     <n-layout-content content-style="padding:0 20px;">
       <n-tabs
+          :group="{ name: 'attr', pull: 'false', put: true }"
           class="card-tabs"
           default-value="table"
           size="large"
@@ -49,14 +50,20 @@
         </template>
         <n-tab-pane name="table" tab="列表配置">
           <draggable
-              :list="searchForm"
-              group="{ name: 'attributes', pull: false, put: true }"
               class="search-form"
+              group="attr"
+              :component-data="{ tag: 'ul', type: 'transition-group', name: !drag ? 'flip-list' : null }"
+              v-model="searchForm"
+              @start="drag = true"
+              @end="drag = false"
+              :animation="200"
+              :disabled="false"
+              ghostClass="ghost"
               item-key="id"
           >
             <template #item="{ element }">
-              <div class="search-item">
-                <span v-if="element">{{ element.attrName }}</span>
+              <div class="search-form-item" :class="{'full': !!element.displayFull}">
+                {{ element.attrName }}
               </div>
             </template>
           </draggable>
@@ -77,6 +84,7 @@ import draggable from 'vuedraggable'
 
 const modelValue = defineModel()
 const attrs = ref([])
+const drag = ref(false)
 const searchForm = ref([
   {id: uuidv4(), attrName: 'id1'},
   {id: uuidv4(), attrName: 'id2'},
@@ -84,8 +92,16 @@ const searchForm = ref([
   {id: uuidv4(), attrName: 'id4'}])
 
 const log = (event) => {
-  console.log(log)
+  console.log(event)
 }
+
+const clone = (item) => {
+  console.log({...item})
+  return {
+    ...item,
+  }
+}
+
 onMounted(async() => {
   const res = await axios.get('/api/columns', {params: {tableName: modelValue.value.tableName}})
   const columns = res.data
@@ -103,7 +119,7 @@ onMounted(async() => {
 })
 </script>
 
-<style scoped>
+<style>
 .field-item {
   height: 40px;
   line-height: 40px;
@@ -113,27 +129,27 @@ onMounted(async() => {
   cursor: move;
 }
 
-.search-form {
-
-}
-
-.search-item {
-  display: inline-block;
-  width: 100px;
-  border: 1px solid #ccc;
-  margin: 3px;
-}
-
-.flip-list-move {
-  transition: transform 0.5s;
-}
-
-.no-move {
-  transition: transform 0s;
-}
-
 .ghost {
-  opacity: 0.5;
-  background: #c8ebfb;
+  opacity: 0.2;
+  background: #ccc;
+  border: 1px dot-dash #999;
 }
+
+.search-form {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.search-form-item {
+  flex: 0 0 50%; /* 每个元素占一半宽度 */
+  box-sizing: border-box; /* 包含内边距和边框 */
+  padding: 10px;
+  cursor: move;
+  border: 1px solid #ccc;
+}
+
+.search-form-item.full {
+  flex: 0 0 100%; /* 每个元素占一半宽度 */
+}
+
 </style>
