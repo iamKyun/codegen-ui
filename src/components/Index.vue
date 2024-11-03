@@ -9,13 +9,11 @@
         </n-flex>
       </n-flex>
     </n-layout-header>
-    <n-layout-content bordered content-style="padding: 20px;">
+    <n-layout-content bordered content-style="padding: 10px;">
       <select-mode v-show="curStep === 'selectMode'" v-model="selectedMode" />
       <select-table v-if="curStep === 'selectMainTable'" :multiple="false" v-model="selectedMainTables" />
       <select-table v-if="curStep === 'selectSubTable'" :multiple="true" v-model="selectedSubTables" />
-      <!--        <config-main-table v-if="curStep === 'configMainTable'" v-model="mainTableConfig" />-->
-      <config-page v-if="curStep === 'configMainTable'" v-model="pageConfig" />
-      <config-sort v-if="curStep === 'configMainTableOrder'" v-model="mainTableOrderConfig" />
+      <config-page v-if="curStep === 'configPage'" v-model="pageConfig" />
     </n-layout-content>
   </n-layout>
 </template>
@@ -25,7 +23,6 @@ import {ref} from 'vue'
 import SelectMode from '@/components/SelectMode.vue'
 import {useMessage} from 'naive-ui'
 import SelectTable from '@/components/SelectTable.vue'
-import ConfigSort from '@/components/ConfigSort.vue'
 import ConfigPage from '@/components/ConfigPage.vue'
 
 const message = useMessage()
@@ -35,12 +32,11 @@ const stepText = {
   selectMode: '选择模式',
   selectMainTable: '选择主表',
   selectSubTables: '选择子表',
-  configMainTable: '主表配置',
-  configMainTableOrder: '页面字段顺序调整',
+  configPage: '页面配置',
 }
 const modeSteps = {
-  'single': ['selectMode', 'selectMainTable', 'configMainTable', 'configMainTableOrder'],
-  'oneToMany': ['selectMode', 'selectMainTable', 'selectSubTables', 'configMainTable'],
+  'single': ['selectMode', 'selectMainTable', 'configPage'],
+  'oneToMany': ['selectMode', 'selectMainTable', 'selectSubTables'],
   'entity': ['selectMode', 'selectMainTable'],
 }
 const steps = ref(modeSteps.single)
@@ -52,7 +48,6 @@ const selectedMainTables = ref([])
 const selectedSubTables = ref([])
 const mainTableConfig = ref({})
 const pageConfig = ref({})
-const mainTableOrderConfig = ref({})
 
 const nextStep = () => {
   switch (curStep.value) {
@@ -72,7 +67,7 @@ const nextStep = () => {
       mainTableConfig.value = {general: {tableName: selectedMainTables.value[0]}}
       pageConfig.value = {tableName: selectedMainTables.value[0]}
       break
-    case 'configMainTable':
+    case 'configPage':
       console.log(mainTableConfig.value)
       const orderConfig = {
         search: [],
@@ -96,9 +91,6 @@ const nextStep = () => {
         }
       })
 
-      mainTableOrderConfig.value = orderConfig
-      break
-    case 'configMainTableOrder':
       break
   }
   if (curStepCount.value < steps.value.length) {
@@ -115,6 +107,6 @@ const previousStep = () => {
 <style scoped>
 .main {
   height: 100vh;
-  padding: 20px;
+  padding: 16px 20px;
 }
 </style>
