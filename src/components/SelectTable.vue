@@ -1,6 +1,6 @@
 <template>
   <n-input placeholder="搜索"
-           style="margin-bottom: 6px;width: 30%;"
+           style="margin-bottom: 6px;width: 500px;"
            v-model:value="searchText"
            clearable>
     <template #suffix>

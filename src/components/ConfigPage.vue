@@ -75,7 +75,7 @@
         pane-style="padding-left: 4px; padding-right: 4px; box-sizing: border-box;">
       <template #suffix>
         <n-space>
-          <n-button type="primary" @click="()=>config('general',null)">
+          <n-button type="primary" @click="addSubTableShow=true">
             <template #icon>
               <n-icon>
                 <Add />
@@ -83,7 +83,7 @@
             </template>
             增加子表
           </n-button>
-          <n-button type="info" @click="()=>config('general',null)">
+          <n-button type="info" @click="config('general',null)">
             <template #icon>
               <n-icon>
                 <Cog />
@@ -111,53 +111,11 @@
                   @change="(evt)=>onCloneAttr('search', evt)"
               >
                 <template #item="{ element }">
-                  <n-flex class="search-form-item w-full h-full"
-                          :class="{
-                              'full': !!element.displayFull,
-                              'editing': configType === 'search' && element.id===editingId,
-                       }"
-                  >
-                    <n-flex :wrap="false" align="center" justify="flex-start" class="w-full h-full">
-                      <n-flex :wrap="false" align="center" justify="space-between"  class="w-20 h-full">
-                        <span>{{ element.label }}</span>
-                        <span> :</span>
-                      </n-flex>
-                      <div class="flex-1">
-                        <n-input v-if="element.type==='input'" placeholder="文本搜索" size="medium" disabled />
-                        <n-space v-if="element.type==='number' && !!element.rangeSearch" justify="center" :wrap="false">
-                          <n-input-number disabled placeholder="" />
-                          <span>~</span>
-                          <n-input-number disabled placeholder="" />
-                        </n-space>
-                        <n-input-number v-if="element.type==='number' && !element.rangeSearch"
-                                        disabled
-                                        placeholder="数字搜索" />
-                        <n-date-picker v-if="element.type==='date'"
-                                       disabled
-                                       :type="element.rangeSearch?'datetimerange':'date'" />
-                        <div v-if="element.type==='radio' || element.type==='dictRadio'">
-                          <n-radio v-for="i in exampleOptions" :key="i.value" :value="i.value" disabled>
-                            {{ i.label }}
-                          </n-radio>
-                        </div>
-                        <n-select v-if="element.type==='select' || element.type==='dictSelect'"
-                                  value-field="key"
-                                  label-field="value"
-                                  placeholder="下拉选择"
-                                  disabled />
-                      </div>
-                    </n-flex>
-                    <div class="operations">
-                      <n-space>
-                        <n-button text type="info" class="btn" @click="config('search',element)">
-                          配置
-                        </n-button>
-                        <n-button text type="error" class="btn" @click="handleRemoveConfig('search',element.id)">
-                          删除
-                        </n-button>
-                      </n-space>
-                    </div>
-                  </n-flex>
+                  <search-drag-item :element="element"
+                                    config-type="search"
+                                    :editing-id="editingId"
+                                    @config="config('search',element)"
+                                    @remove="handleRemoveConfig('search',element.id)" />
                 </template>
               </draggable>
             </n-card>
@@ -182,23 +140,11 @@
                     </th>
                   </template>
                   <template #item="{ element }">
-                    <th class="table-config-th attr"
-                        :class="{ 'editing': configType === 'table' && element.id===editingId, }"
-                        scope="col">
-                      <div>
-                        <span>{{ element.label }}</span>
-                        <div class="operations">
-                          <n-space>
-                            <n-button text type="info" class="btn" @click="config('table',element)">
-                              配置
-                            </n-button>
-                            <n-button text type="error" class="btn" @click="handleRemoveConfig('table',element.id)">
-                              删除
-                            </n-button>
-                          </n-space>
-                        </div>
-                      </div>
-                    </th>
+                    <table-drag-item :element="element"
+                                     config-type="table"
+                                     :editing-id="editingId"
+                                     @config="config('table',element)"
+                                     @remove="handleRemoveConfig('table',element.id)" />
                   </template>
                   <template #footer>
                     <th class="table-config-th action" scope="col">
@@ -249,54 +195,11 @@
                 @change="(evt)=>onCloneAttr('form', evt)"
             >
               <template #item="{ element }">
-                <n-flex class="search-form-item w-full h-full"
-                        :class="{
-                              'full': !!element.displayFull,
-                              'editing': configType === 'form' && element.id===editingId,
-                       }"
-                >
-                  <n-flex :wrap="false" align="start" class="w-full h-full">
-                    <n-flex :wrap="false" align="center" justify="space-between"  class="w-20 h-full pt-1.5">
-                      <span>{{ element.label }}</span>
-                      <span> :</span>
-                    </n-flex>
-                    <div class="flex-1">
-                      <n-input v-if="['input','textarea'].includes(element.type)" :type="element.type==='input'?'input':'textarea'" placeholder="文本输入" size="medium" disabled />
-                      <n-input-number v-if="element.type==='number'"
-                                      disabled
-                                      placeholder="数字输入" />
-                      <n-date-picker v-if="element.type==='date'"
-                                     disabled />
-                      <div v-if="element.type==='radio' || element.type==='dictRadio'" class="pt-1.5">
-                        <n-radio v-for="i in exampleOptions" :key="i.value" :value="i.value" disabled>
-                          {{ i.label }}
-                        </n-radio>
-                      </div>
-                      <n-select v-if="element.type==='select' || element.type==='dictSelect'"
-                                value-field="key"
-                                label-field="value"
-                                placeholder="下拉选择"
-                                disabled />
-                      <n-upload
-                          v-if="element.type==='attachment'"
-                          disabled
-                          :file-list="[{ id: 'url-test', name: '附件', url: 'https://www.baidu.com/', status: 'finished' }]"
-                      >
-                        <n-button>上传文件</n-button>
-                      </n-upload>
-                    </div>
-                  </n-flex>
-                  <div class="operations">
-                    <n-space>
-                      <n-button text type="info" class="btn" @click="config('form',element)">
-                        配置
-                      </n-button>
-                      <n-button text type="error" class="btn" @click="handleRemoveConfig('form',element.id)">
-                        删除
-                      </n-button>
-                    </n-space>
-                  </div>
-                </n-flex>
+                <form-drag-item :element="element"
+                                config-type="form"
+                                :editing-id="editingId"
+                                @config="config('form',element)"
+                                @remove="handleRemoveConfig('form',element.id)" />
               </template>
             </draggable>
           </n-scrollbar>
@@ -323,20 +226,8 @@
       </n-scrollbar>
     </n-card>
   </n-flex>
-  <n-drawer v-model:show="showAttrEdit" :width="502" placement="left" :mask-closable="false">
-    <n-drawer-content title="属性配置">
-      <attribute-config-form ref="attributeConfig"
-                             v-model="editAttr"
-                             :attrs="attrs" />
-
-      <template #footer>
-        <n-space>
-          <n-button @click="showAttrEdit = false">取消</n-button>
-          <n-button type="primary" @click="onEditAttrOk">确定</n-button>
-        </n-space>
-      </template>
-    </n-drawer-content>
-  </n-drawer>
+  <attribute-config-drawer v-model="showAttrEdit" :attrs="attrs" :data="editAttr" @confirm="onEditAttrOk" />
+  <add-sub-table-drawer v-model="addSubTableShow" @confirm="addSubTable" />
 </template>
 
 <script setup>
@@ -346,10 +237,14 @@ import axios from 'axios'
 import {toCamelCase, uuidv4} from '@/utils/StringUtils.js'
 import draggable from 'vuedraggable'
 import GeneralConfigForm from '@/components/config/GeneralConfigForm.vue'
-import FormConfigForm from '@/components/config/FormConfigForm.vue'
-import TableConfigForm from '@/components/config/TableConfigForm.vue'
-import SearchConfigForm from '@/components/config/SearchConfigForm.vue'
-import AttributeConfigForm from '@/components/config/AttributeConfigForm.vue'
+import FormConfigForm from '@/components/form/FormConfigForm.vue'
+import TableConfigForm from '@/components/table/TableConfigForm.vue'
+import SearchConfigForm from '@/components/search/SearchConfigForm.vue'
+import AddSubTableDrawer from '@/components/config/AddSubTableDrawer.vue'
+import AttributeConfigDrawer from '@/components/attr/AttributeConfigDrawer.vue'
+import SearchDragItem from '@/components/search/SearchDragItem.vue'
+import TableDragItem from '@/components/table/TableDragItem.vue'
+import FormDragItem from '@/components/form/FormDragItem.vue'
 
 const modelValue = defineModel()
 const message = useMessage()
@@ -368,10 +263,6 @@ const configs = ref({
 const searchConfig = ref({})
 const tableConfig = ref({})
 const formConfig = ref({})
-const exampleOptions = [
-  {value: '1', label: '选项一'},
-  {value: '2', label: '选项二'},
-]
 
 const configType = ref('general')
 const editingId = ref(null)
@@ -420,11 +311,9 @@ const clone = (item) => {
   }
 }
 
-const attributeConfig = ref()
 const showAttrEdit = ref(false)
 const editAttr = ref(null)
 const handleConfigAttr = (row) => {
-  showAttrEdit.value = true
   if (row) {
     editAttr.value = {...row}
   } else {
@@ -432,6 +321,7 @@ const handleConfigAttr = (row) => {
       from: 'add',
     }
   }
+  showAttrEdit.value = true
 }
 
 const handleRemoveAttr = (id) => {
@@ -439,22 +329,14 @@ const handleRemoveAttr = (id) => {
   attrs.value.splice(index, 1)
 }
 
-const onEditAttrOk = () => {
-  attributeConfig.value.validate((errors) => {
-    console.log(editAttr.value)
-    if (!errors) {
-      if (!editAttr.value.id) {
-        attrs.value.push({id: uuidv4(), ...editAttr.value})
-      } else {
-        const index = attrs.value.findIndex(item => item.id === editAttr.value.id)
-        attrs.value.splice(index, 1, {...editAttr.value})
-      }
-      showAttrEdit.value = false
-    } else {
-      console.log(errors)
-      message.error('请按规则完成配置')
-    }
-  })
+const onEditAttrOk = (attr) => {
+  console.log(attr)
+  if (!attr.id) {
+    attrs.value.push({id: uuidv4(), ...attr})
+  } else {
+    const index = attrs.value.findIndex(item => item.id === attr.id)
+    attrs.value.splice(index, 1, {...attr})
+  }
 }
 
 const handleRemoveConfig = (type, id) => {
@@ -462,6 +344,18 @@ const handleRemoveConfig = (type, id) => {
   configs.value[type].search.splice(index, 1)
 }
 
+const selectedSubTables = ref([])
+const addSubTableShow = ref(false)
+
+const addSubTable = (tables) => {
+  tables.forEach(table => {
+    if (selectedSubTables.value.includes(table)) {
+      message.error(`${table}表已经添加过了`)
+    } else {
+      selectedSubTables.value.push(table)
+    }
+  })
+}
 onMounted(async() => {
   const res = await axios.get('/api/columns', {params: {tableName: modelValue.value.tableName}})
   const columns = res.data
@@ -505,47 +399,6 @@ onMounted(async() => {
   opacity: 0.2;
   background: #e0e0e0;
   border: 1px dot-dash #aaa;
-}
-
-.search-form-item {
-  flex: 0 0 calc(50% - 10px);
-  box-sizing: border-box;
-  padding: 10px;
-  margin: 5px;
-  cursor: move;
-  border: 1px dashed #ffff;
-  position: relative;
-}
-
-.search-form-item .operations {
-  position: absolute;
-  right: 0;
-  top: 1px;
-  transform: translateY(-100%);
-  border: 1px dashed #ffff;
-  padding: 0 3px;
-}
-
-.search-form-item .operations {
-  visibility: hidden;
-}
-
-.search-form-item:hover .operations {
-  border: 1px dashed #ccc;
-  border-bottom-color: #ffff;
-  visibility: visible;
-}
-
-.search-form-item:hover {
-  border: 1px dashed #ccc;
-}
-
-.search-form-item.full {
-  flex: 0 0 100%;
-}
-
-.search-form-item.editing {
-  border: 1px dashed #d93636;
 }
 
 .attr-config {

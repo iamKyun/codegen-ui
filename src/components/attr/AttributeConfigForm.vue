@@ -10,8 +10,8 @@
       <n-input v-model:value="formValue.attrName" />
     </n-form-item>
 
-    <n-form-item path="comment" label="备注">
-      <n-input v-model:value="formValue.comment" />
+    <n-form-item path="attrComment" label="备注">
+      <n-input v-model:value="formValue.attrComment" />
     </n-form-item>
 
     <n-form-item path="from" label="来源">
@@ -51,7 +51,7 @@ const rules = {
     },
     trigger: ['blur', 'input'],
   },
-  comment: {
+  attrComment: {
     required: true,
     trigger: ['blur', 'input'],
     message: '请输入备注',
