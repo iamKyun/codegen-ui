@@ -1,17 +1,17 @@
 // src/mock/index.js
 import Mock from 'mockjs'
 import {insertRandomUnderscores} from '@/utils/StringUtils.js'
+const tables = Mock.mock({
+  'data|100-200': [
+    {
+      'tableName': '@word()',
+      'tableComment': '@city',
+    },
+  ],
+})
 
 Mock.mock('/api/tables', 'get', (options) => {
-  const mock = Mock.mock({
-    'data|100-200': [
-      {
-        'tableName': '@word()',
-        'tableComment': '@city',
-      },
-    ],
-  })
-  return mock.data
+  return tables.data
 })
 
 Mock.mock(/\/api\/columns\?tableName=.*/, 'get', (options) => {

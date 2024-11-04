@@ -16,16 +16,6 @@
       </n-switch>
     </n-form-item>
 
-    <n-form-item path="isShowAction">
-      <template #label>
-        <label-with-tooltip label="列表展示操作列" tooltip="列表展示操作列" />
-      </template>
-      <n-switch v-model:value="formValue.isShowAction" :default-value="true">
-        <template #checked>是</template>
-        <template #unchecked>否</template>
-      </n-switch>
-    </n-form-item>
-
     <n-form-item path="isUseCommonGroup">
       <template #label>
         <label-with-tooltip label="使用通用分组" tooltip="是否使用通用分组，在列表页面展示分组" />

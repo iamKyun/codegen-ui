@@ -89,7 +89,7 @@
                 <Cog />
               </n-icon>
             </template>
-            基础配置
+            主表配置
           </n-button>
         </n-space>
       </template>
@@ -182,7 +182,7 @@
         <n-card content-style="padding: 0;">
           <n-scrollbar style="max-height: calc(100vh - 200px);">
             <draggable
-                class="flex flex-wrap content-start pr-4 pt-5 min-h-96"
+                class="flex flex-wrap content-start pr-4 pt-5 min-h-52"
                 v-model="configs.form"
                 group="attr"
                 :component-data="{ tag: 'ul', type: 'transition-group', name: !drag ? 'flip-list' : null }"
@@ -202,6 +202,63 @@
                                 @remove="handleRemoveConfig('form',element.id)" />
               </template>
             </draggable>
+            <div class="sub-table" v-for="(item,index) in subTables" :key="index">
+              <n-scrollbar x-scrollable style="max-width: calc(100vw - 690px)">
+                <table class="table-config">
+                  <thead class="table-config-thead">
+                  <draggable v-model="configs.table"
+                             group="attr"
+                             tag="tr"
+                             :component-data="{ tag: 'tr', type: 'transition-group', name: !drag ? 'flip-list' : null }"
+                             @start="drag = true"
+                             @end="drag = false"
+                             :animation="200"
+                             :disabled="false"
+                             ghostClass="ghost"
+                             item-key="id"
+                             @change="(evt)=>onCloneAttr('table',evt)"
+                  >
+                    <template #header v-if="configs.general.isShowNum">
+                      <th class="table-config-th num" scope="col">
+                        <span>序号</span>
+                      </th>
+                    </template>
+                    <template #item="{ element }">
+                      <table-drag-item :element="element"
+                                       config-type="table"
+                                       :editing-id="editingId"
+                                       @config="config('table',element)"
+                                       @remove="handleRemoveConfig('table',element.id)" />
+                    </template>
+                    <template #footer>
+                      <th class="table-config-th action" scope="col">
+                        <span>操作</span>
+                      </th>
+                    </template>
+                  </draggable>
+                  </thead>
+                  <tbody>
+                  <tr class="table-config-tr" v-for="(item,index) in 1">
+                    <td class="table-config-td" v-if="configs.general.isShowNum">{{ index + 1 }}</td>
+                    <td class="table-config-td" v-for="header in configs.table" :key="header.id"> {{
+                        header.label
+                      }}内容
+                    </td>
+                    <td class="table-config-td">
+                      <n-space>
+                        <n-button text type="info" class="btn" disabled>
+                          编辑
+                        </n-button>
+                        <n-button text type="error" class="btn" disabled>
+                          删除
+                        </n-button>
+                      </n-space>
+                    </td>
+                  </tr>
+                  </tbody>
+                </table>
+              </n-scrollbar>
+            </div>
           </n-scrollbar>
         </n-card>
       </n-tab-pane>
@@ -227,7 +284,7 @@
     </n-card>
   </n-flex>
   <attribute-config-drawer v-model="showAttrEdit" :attrs="attrs" :data="editAttr" @confirm="onEditAttrOk" />
-  <add-sub-table-drawer v-model="addSubTableShow" @confirm="addSubTable" />
+  <add-sub-table-drawer v-model:show="addSubTableShow" v-model:tables="subTables" @confirm="addSubTable" />
 </template>
 
 <script setup>
@@ -269,7 +326,7 @@ const editingId = ref(null)
 const configTitle = computed(() => {
   switch (configType.value) {
     case 'general':
-      return '基础配置'
+      return '主表配置'
     case 'search':
       return '搜索项配置'
     case 'table':
@@ -344,17 +401,11 @@ const handleRemoveConfig = (type, id) => {
   configs.value[type].search.splice(index, 1)
 }
 
-const selectedSubTables = ref([])
+const subTables = ref([])
 const addSubTableShow = ref(false)
 
-const addSubTable = (tables) => {
-  tables.forEach(table => {
-    if (selectedSubTables.value.includes(table)) {
-      message.error(`${table}表已经添加过了`)
-    } else {
-      selectedSubTables.value.push(table)
-    }
-  })
+const addSubTable = () => {
+  console.log(subTables.value)
 }
 onMounted(async() => {
   const res = await axios.get('/api/columns', {params: {tableName: modelValue.value.tableName}})
@@ -376,7 +427,6 @@ onMounted(async() => {
     general: {
       tableName: modelValue.value.tableName,
       isShowNum: true,
-      isShowAction: true,
     },
     search: [],
     table: [],
@@ -484,4 +534,7 @@ onMounted(async() => {
   background-color: #f3f3f3;
 }
 
+.sub-table{
+  margin:10px;
+}
 </style>

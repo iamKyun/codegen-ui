@@ -65,6 +65,7 @@ const rowProps = (row) => {
         } else {
           arr.push(tableName)
         }
+        model.value = arr
       } else {
         model.value = [row.tableName]
       }
