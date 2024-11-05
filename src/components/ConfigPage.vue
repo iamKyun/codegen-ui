@@ -1,6 +1,15 @@
 <template>
   <n-flex :wrap="false">
-    <n-card class="attr-config" title="待选属性">
+    <n-card class="attr-config">
+      <template #header>
+        <div>待选属性</div>
+        <n-tooltip trigger="hover">
+          <template #trigger>
+            <n-tag>{{ configs.general.tableName }}</n-tag>
+          </template>
+          表名
+        </n-tooltip>
+      </template>
       <template #header-extra>
         <n-button size="small" type="primary" @click="()=>handleConfigAttr(null)">
           <template #icon>
@@ -14,7 +23,7 @@
       <n-scrollbar style="max-height: calc(100vh - 200px);padding-right: 16px;">
         <draggable
             :list="attrs"
-            :group="{ name: 'attr', pull: 'clone', put: false }"
+            :group="{ name: 'main', pull: 'clone', put: false }"
             :clone="clone"
             item-key="id"
         >
@@ -66,7 +75,6 @@
       </n-scrollbar>
     </n-card>
     <n-tabs
-        :group="{ name: 'attr', pull: 'false', put: true }"
         class="flex-1"
         default-value="table"
         size="large"
@@ -89,7 +97,7 @@
                 <Cog />
               </n-icon>
             </template>
-            主表配置
+            通用配置
           </n-button>
         </n-space>
       </template>
@@ -100,7 +108,7 @@
               <draggable
                   class="flex flex-wrap"
                   v-model="configs.search"
-                  group="attr"
+                  group="main"
                   :component-data="{ tag: 'ul', type: 'transition-group', name: !drag ? 'flip-list' : null }"
                   @start="drag = true"
                   @end="drag = false"
@@ -119,11 +127,15 @@
                 </template>
               </draggable>
             </n-card>
+            <n-space class="table-config-header">
+              <n-button disabled type="info">新增</n-button>
+              <n-button disabled type="error">批量删除</n-button>
+            </n-space>
             <n-scrollbar x-scrollable style="max-width: calc(100vw - 690px)">
               <table class="table-config">
                 <thead class="table-config-thead">
                 <draggable v-model="configs.table"
-                           group="attr"
+                           group="main"
                            tag="tr"
                            :component-data="{ tag: 'tr', type: 'transition-group', name: !drag ? 'flip-list' : null }"
                            @start="drag = true"
@@ -184,7 +196,7 @@
             <draggable
                 class="flex flex-wrap content-start pr-4 pt-5 min-h-52"
                 v-model="configs.form"
-                group="attr"
+                group="main"
                 :component-data="{ tag: 'ul', type: 'transition-group', name: !drag ? 'flip-list' : null }"
                 @start="drag = true"
                 @end="drag = false"
@@ -202,12 +214,22 @@
                                 @remove="handleRemoveConfig('form',element.id)" />
               </template>
             </draggable>
-            <div class="sub-table" v-for="(item,index) in subTables" :key="index">
+            <div class="sub-table" v-for="(item,index) in configs.subTables" :key="index">
+              <n-space class="table-config-header">
+                <n-button disabled type="info">新增</n-button>
+                <n-button disabled type="error">批量删除</n-button>
+                <n-tooltip trigger="hover">
+                  <template #trigger>
+                    <n-tag>{{ item.general.tableName }}</n-tag>
+                  </template>
+                  表名
+                </n-tooltip>
+              </n-space>
               <n-scrollbar x-scrollable style="max-width: calc(100vw - 690px)">
                 <table class="table-config">
                   <thead class="table-config-thead">
-                  <draggable v-model="configs.table"
-                             group="attr"
+                  <draggable v-model="item.table"
+                             :group="`subTable-${item.table}`"
                              tag="tr"
                              :component-data="{ tag: 'tr', type: 'transition-group', name: !drag ? 'flip-list' : null }"
                              @start="drag = true"
@@ -218,7 +240,7 @@
                              item-key="id"
                              @change="(evt)=>onCloneAttr('table',evt)"
                   >
-                    <template #header v-if="configs.general.isShowNum">
+                    <template #header v-if="item.general.isShowNum">
                       <th class="table-config-th num" scope="col">
                         <span>序号</span>
                       </th>
@@ -238,9 +260,9 @@
                   </draggable>
                   </thead>
                   <tbody>
-                  <tr class="table-config-tr" v-for="(item,index) in 1">
-                    <td class="table-config-td" v-if="configs.general.isShowNum">{{ index + 1 }}</td>
-                    <td class="table-config-td" v-for="header in configs.table" :key="header.id"> {{
+                  <tr class="table-config-tr" v-for="(_,index) in 1">
+                    <td class="table-config-td" v-if="item.general.isShowNum">{{ index + 1 }}</td>
+                    <td class="table-config-td" v-for="header in item.table" :key="header.id"> {{
                         header.label
                       }}内容
                     </td>
@@ -258,6 +280,16 @@
                   </tbody>
                 </table>
               </n-scrollbar>
+              <div class="operations">
+                <n-space>
+                  <n-button text type="info" class="btn" @click="config('subTablesGeneral',item)">
+                    配置
+                  </n-button>
+                  <n-button text type="error" class="btn" @click="handleRemoveConfig('subTables',item.id)">
+                    删除
+                  </n-button>
+                </n-space>
+              </div>
             </div>
           </n-scrollbar>
         </n-card>
@@ -266,8 +298,9 @@
     <n-card class="attr-config" :title="configTitle" ref="attrConfig">
       <n-scrollbar style="max-height: calc(100vh - 200px);padding-right: 16px;">
         <general-config-form ref="generalConfigForm"
-                             v-show="configType === 'general'"
-                             v-model="configs.general"
+                             v-show="configType === 'general' || configType === 'subTablesGeneral'"
+                             :table-name="generalConfigTableName"
+                             v-model="generalConfig"
                              :table-columns="tableColumns" />
         <search-config-form ref="searchConfigForm"
                             v-show="configType === 'search'"
@@ -315,8 +348,11 @@ const configs = ref({
   search: [],
   table: [],
   form: [],
+  subTables: [],
 })
 
+const generalConfigTableName = ref('')
+const generalConfig = ref({})
 const searchConfig = ref({})
 const tableConfig = ref({})
 const formConfig = ref({})
@@ -326,13 +362,15 @@ const editingId = ref(null)
 const configTitle = computed(() => {
   switch (configType.value) {
     case 'general':
-      return '主表配置'
+      return '通用配置'
     case 'search':
       return '搜索项配置'
     case 'table':
       return '列表项配置'
     case 'form':
       return '表单项配置'
+    case 'subTablesGeneral':
+      return '子表通用配置'
   }
 })
 
@@ -344,6 +382,11 @@ const config = (type, item) => {
     tableConfig.value = item
   } else if (type === 'form') {
     formConfig.value = item
+  } else if (type === 'subTablesGeneral') {
+    generalConfig.value = item.general
+    generalConfigTableName.value = item.general.tableName
+  } else if (type === 'general') {
+    generalConfig.value = configs.value.general
   }
   if (item) {
     editingId.value = item.id
@@ -398,7 +441,7 @@ const onEditAttrOk = (attr) => {
 
 const handleRemoveConfig = (type, id) => {
   const index = configs.value[type].findIndex(item => item.id === id)
-  configs.value[type].search.splice(index, 1)
+  configs.value[type].splice(index, 1)
 }
 
 const subTables = ref([])
@@ -406,6 +449,20 @@ const addSubTableShow = ref(false)
 
 const addSubTable = () => {
   console.log(subTables.value)
+  configs.value.subTables = configs.value.subTables.filter(item => subTables.value.includes(item.tableName))
+  subTables.value.forEach(table => {
+    if (!configs.value.subTables.find(item => item.tableName === table)) {
+      configs.value.subTables.push({
+        id: uuidv4(),
+        general: {
+          tableName: table,
+          isShowNum: true,
+        },
+        table: [],
+        form: [],
+      })
+    }
+  })
 }
 onMounted(async() => {
   const res = await axios.get('/api/columns', {params: {tableName: modelValue.value.tableName}})
@@ -431,7 +488,10 @@ onMounted(async() => {
     search: [],
     table: [],
     form: [],
+    subTables: [],
   }
+  generalConfig.value = configs.value.general
+
 })
 </script>
 
@@ -462,7 +522,7 @@ onMounted(async() => {
   background-color: #f9f9f9;
   border-radius: 2px;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-  margin-top: 30px;
+  margin-top: 20px;
   text-align: left;
   min-width: 100%;
 }
@@ -535,6 +595,39 @@ onMounted(async() => {
 }
 
 .sub-table{
-  margin:10px;
+  margin: 15px 5px;
+  padding: 5px;
+  border: 1px dashed #ffff;
+  position: relative;
+  box-sizing: border-box;
 }
+
+.sub-table:hover {
+  border: 1px dashed #ccc;
+}
+
+.sub-table .operations {
+  position: absolute;
+  right: 0;
+  top: 1px;
+  transform: translateY(-100%);
+  border: 1px dashed #ffff;
+  padding: 0 3px;
+}
+
+.sub-table .operations {
+  visibility: hidden;
+}
+
+.sub-table:hover .operations {
+  border: 1px dashed #ccc;
+  border-bottom-color: #ffff;
+  visibility: visible;
+}
+
+.table-config-header {
+  position: relative;
+  top: 16px;
+}
+
 </style>
