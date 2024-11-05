@@ -1,78 +1,18 @@
 <template>
   <n-flex :wrap="false">
-    <n-card class="attr-config">
-      <template #header>
-        <div>待选属性</div>
-        <n-tooltip trigger="hover">
-          <template #trigger>
-            <n-tag>{{ configs.general.tableName }}</n-tag>
-          </template>
-          表名
-        </n-tooltip>
-      </template>
-      <template #header-extra>
-        <n-button size="small" type="primary" @click="()=>handleConfigAttr(null)">
-          <template #icon>
-            <n-icon>
-              <Add />
-            </n-icon>
-          </template>
-          添加字段
-        </n-button>
-      </template>
-      <n-scrollbar style="max-height: calc(100vh - 200px);padding-right: 16px;">
-        <draggable
-            :list="attrs"
-            :group="{ name: 'main', pull: 'clone', put: false }"
-            :clone="clone"
-            item-key="id"
-        >
-          <template #item="{ element }">
-            <div class="field-item">
-              <n-flex justify="space-between" align="center">
-                <n-space align="center">
-                  <n-tooltip>
-                    <template #trigger>
-                      <n-flex align="center">
-                        <n-icon size="large" style="cursor: help;">
-                          <DocumentTextOutline />
-                        </n-icon>
-                      </n-flex>
-                    </template>
-                    {{ element.attrComment }}
-                  </n-tooltip>
-                  <span>{{ element.attrName }}</span>
-                </n-space>
-                <n-space justify="center" align="center">
-                  <n-popconfirm
-                      @positive-click="handleRemoveAttr(element.id)"
-                      v-if="element.from === 'add'"
-                  >
-                    <template #trigger>
-                      <n-button text type="error">
-                        <template #icon>
-                          <n-icon>
-                            <Trash />
-                          </n-icon>
-                        </template>
-                      </n-button>
-                    </template>
-                    确认删除？
-                  </n-popconfirm>
-
-                  <n-button text type="warning" @click="()=>handleConfigAttr(element)">
-                    <template #icon>
-                      <n-icon>
-                        <CreateOutline />
-                      </n-icon>
-                    </template>
-                  </n-button>
-                </n-space>
-              </n-flex>
-            </div>
-          </template>
-        </draggable>
-      </n-scrollbar>
+    <n-card class="attr-config" title="可用组件">
+      <n-collapse default-expanded-names="1" accordion>
+        <n-collapse-item title="查询组件" name="1">
+          <n-scrollbar style="max-height: calc(100vh - 300px);">
+            <search-dragable-element />
+          </n-scrollbar>
+        </n-collapse-item>
+        <n-collapse-item title="表单组件" name="2">
+          <n-scrollbar style="max-height: calc(100vh - 300px);">
+            <div v-for="i in 1000">可以</div>
+          </n-scrollbar>
+        </n-collapse-item>
+      </n-collapse>
     </n-card>
     <n-tabs
         class="flex-1"
@@ -322,7 +262,7 @@
 
 <script setup>
 import {NButton, NIcon, useMessage} from 'naive-ui'
-import {Add, Cog, CreateOutline, DocumentTextOutline, Trash} from '@vicons/ionicons5'
+import {Add, Cog} from '@vicons/ionicons5'
 import axios from 'axios'
 import {toCamelCase, uuidv4} from '@/utils/StringUtils.js'
 import draggable from 'vuedraggable'
@@ -335,6 +275,7 @@ import AttributeConfigDrawer from '@/components/attr/AttributeConfigDrawer.vue'
 import SearchDragItem from '@/components/search/SearchDragItem.vue'
 import TableDragItem from '@/components/table/TableDragItem.vue'
 import FormDragItem from '@/components/form/FormDragItem.vue'
+import SearchDragableElement from '@/components/element/SearchDragableElement.vue'
 
 const modelValue = defineModel()
 const message = useMessage()
@@ -594,7 +535,7 @@ onMounted(async() => {
   background-color: #f3f3f3;
 }
 
-.sub-table{
+.sub-table {
   margin: 15px 5px;
   padding: 5px;
   border: 1px dashed #ffff;

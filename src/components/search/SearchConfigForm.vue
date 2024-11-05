@@ -44,7 +44,18 @@
       </n-switch>
     </n-form-item>
 
-    <n-form-item path="selectOptions" label="选项" v-if="['select','radio'].includes(formValue.type)">
+
+    <n-form-item path="dictCode" v-if="['select','radio'].includes(formValue.type)">
+      <template #label>
+        <label-with-tooltip label="字典编码" tooltip="就是数据字典" />
+      </template>
+      <n-input v-model:value="formValue.dictCode" />
+    </n-form-item>
+
+    <n-form-item path="selectOptions" v-if="['select','radio'].includes(formValue.type)">
+      <template #label>
+        <label-with-tooltip label="选项" tooltip="使用了字典的话就不用填这个了" />
+      </template>
       <n-dynamic-input
           v-model:value="formValue.options"
           preset="pair"
@@ -52,16 +63,13 @@
           value-placeholder="value"
       />
     </n-form-item>
-
-    <n-form-item path="dictCode" label="字典编码" v-if="['dictSelect','dictRadio'].includes(formValue.type)">
-      <n-input v-model:value="formValue.dictCode" />
-    </n-form-item>
   </n-form>
 </template>
 
 <script setup>
 
 import {NSwitch} from 'naive-ui'
+import LabelWithTooltip from '@/components/tool/LabelWithTooltip.vue'
 
 const formValue = defineModel()
 
@@ -71,8 +79,6 @@ const options = [
   {label: '日期', value: 'date'},
   {label: '单选按钮', value: 'radio'},
   {label: '下拉选择', value: 'select'},
-  {label: '字典单选按钮', value: 'dictRadio'},
-  {label: '字典下拉选择', value: 'dictSelect'},
 ]
 
 const rules = {}

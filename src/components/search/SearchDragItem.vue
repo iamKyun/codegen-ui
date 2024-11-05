@@ -23,16 +23,6 @@
         <n-date-picker v-if="element.type==='date'"
                        disabled
                        :type="element.rangeSearch?'datetimerange':'date'" />
-        <div v-if="element.type==='radio' || element.type==='dictRadio'">
-          <n-radio v-for="i in exampleOptions" :key="i.value" :value="i.value" disabled>
-            {{ i.label }}
-          </n-radio>
-        </div>
-        <n-select v-if="element.type==='select' || element.type==='dictSelect'"
-                  value-field="key"
-                  label-field="value"
-                  placeholder="下拉选择"
-                  disabled />
       </div>
     </n-flex>
     <div class="operations">
