@@ -10,6 +10,16 @@
         <span>{{ element.label }}</span>
         <span> :</span>
       </n-flex>
+      <div v-if="element.type==='radio'" class="pt-1.5">
+        <n-radio v-for="i in exampleOptions" :key="i.value" :value="i.value" disabled>
+          {{ i.label }}
+        </n-radio>
+      </div>
+      <n-select v-if="element.type==='select'"
+                value-field="key"
+                label-field="value"
+                placeholder="下拉选择"
+                disabled />
       <div class="flex-1">
         <n-input v-if="['input','textarea'].includes(element.type)" :type="element.type==='input'?'input':'textarea'" placeholder="文本输入" size="medium" disabled />
         <n-input-number v-if="element.type==='number'"
