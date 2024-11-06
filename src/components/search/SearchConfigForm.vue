@@ -3,7 +3,7 @@
     <template #header>
       <config-header title="搜索项配置" :config-type="configType" :table-name="tableName" />
     </template>
-    <n-scrollbar style="max-height: calc(100vh - 200px);padding-right: 16px;">
+    <n-scrollbar style="max-height: calc(100vh - 250px);padding-right: 16px;">
       <n-form
           ref="formRef"
           :key="formValue.id"
@@ -89,9 +89,9 @@ import LabelWithTooltip from '@/components/tool/LabelWithTooltip.vue'
 import {searchElements} from '@/utils/Constants.js'
 import {toCamelCase} from '@/utils/StringUtils.js'
 import ConfigHeader from '@/components/common/ConfigHeader.vue'
+
 const props = defineProps({tableColumns: Array, configType: String, tableName: String})
-const columns = computed(() => props.tableColumns.map(
-    item => ({label: `${item.columnName}(${item.columnComment})`, value: item.columnName})))
+const columns = computed(() => props.tableColumns.map(item => ({label: `${item.columnName}(${item.columnComment})`, value: item.columnName,comment: item.columnComment})))
 const formValue = defineModel()
 
 const rules = {}
@@ -100,8 +100,9 @@ const formRef = ref()
 const validate = (callback) => formRef.value.validate(callback)
 defineExpose({validate})
 
-const handleUpdateColumnName = (value, option)=>{
+const handleUpdateColumnName = (value, option) => {
   formValue.value.attrName = toCamelCase(value)
+  formValue.value.label = option.comment
 }
 </script>
 

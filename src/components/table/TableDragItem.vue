@@ -43,4 +43,22 @@ function handleRemoveConfig() {
 .table-config-th {
   cursor: pointer;
 }
+
+.table-config-th .operations {
+  position: absolute;
+  right: 0;
+  top: 1px;
+  transform: translateY(-100%);
+  padding: 0 3px;
+}
+
+.table-config-th .operations {
+  visibility: hidden;
+}
+
+.table-config-th:hover .operations {
+  border: 1px dashed #ccc;
+  border-bottom: none;
+  visibility: visible;
+}
 </style>

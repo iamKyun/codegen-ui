@@ -3,7 +3,7 @@
     <template #header>
       <config-header title="列表项配置" :config-type="configType" :table-name="tableName" />
     </template>
-    <n-scrollbar style="max-height: calc(100vh - 200px);padding-right: 16px;">
+    <n-scrollbar style="max-height: calc(100vh - 250px);padding-right: 16px;">
       <n-form
           ref="formRef"
           :key="formValue.id"
@@ -38,16 +38,16 @@
           <n-select v-model:value="formValue.type" :options="tableElements" />
         </n-form-item>
 
-        <n-form-item path="width" label="宽度">
-          <n-input v-model:value="formValue.width" />
-        </n-form-item>
-
         <n-form-item path="dictCode" label="字典编码" v-if="formValue.type === 'dict'">
           <n-input v-model:value="formValue.dictCode" />
         </n-form-item>
 
         <n-form-item path="dateFormat" label="日期格式" v-if="formValue.type === 'date'">
           <n-input v-model:value="formValue.dateFormat" default-value="YYYY-MM-DD" />
+        </n-form-item>
+
+        <n-form-item path="width" label="宽度">
+          <n-input v-model:value="formValue.width" />
         </n-form-item>
       </n-form>
     </n-scrollbar>
@@ -63,8 +63,7 @@ import {toCamelCase} from '@/utils/StringUtils.js'
 import ConfigHeader from '@/components/common/ConfigHeader.vue'
 
 const props = defineProps({tableColumns: Array, configType: String, tableName: String})
-const columns = computed(() => props.tableColumns.map(
-    item => ({label: `${item.columnName}(${item.columnComment})`, value: item.columnName})))
+const columns = computed(() => props.tableColumns.map(item => ({label: `${item.columnName}(${item.columnComment})`, value: item.columnName,comment: item.columnComment})))
 const formValue = defineModel()
 
 const rules = {}
@@ -75,6 +74,7 @@ defineExpose({validate})
 
 const handleUpdateColumnName = (value, option) => {
   formValue.value.attrName = toCamelCase(value)
+  formValue.value.label = option.comment
 }
 </script>
 

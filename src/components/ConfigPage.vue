@@ -1,13 +1,13 @@
 <template>
   <n-flex :wrap="false">
     <n-card class="attr-config" title="可用组件">
-      <n-scrollbar style="max-height: calc(100vh - 240px);">
+      <n-scrollbar style="max-height: calc(100vh - 200px);">
         <n-collapse :default-expanded-names="['1','2']">
           <n-collapse-item title="查询组件" name="1">
-            <search-dragable-element />
+            <search-draggable-element />
           </n-collapse-item>
           <n-collapse-item title="表单组件" name="2">
-            <form-dragable-element />
+            <form-draggable-element />
           </n-collapse-item>
         </n-collapse>
       </n-scrollbar>
@@ -67,7 +67,7 @@
             <n-space class="table-config-header" style="top: 26px">
               <n-button type="info" @click="handleAddAttr(configs.table)">添加列</n-button>
             </n-space>
-            <n-scrollbar x-scrollable style="max-width: calc(100vw - 690px)">
+            <n-scrollbar x-scrollable class="pb-3" style="max-width: calc(100vw - 690px)">
               <table class="table-config">
                 <thead class="table-config-thead">
                 <draggable v-model="configs.table"
@@ -82,7 +82,7 @@
                            item-key="id"
                 >
                   <template #header v-if="configs.general.isShowNum">
-                    <th class="table-config-th num" scope="col">
+                    <th class="table-config-th num" :class="{'freeze': configs.general.isFixedNum}" scope="col">
                       <span>序号</span>
                     </th>
                   </template>
@@ -94,7 +94,7 @@
                                      @remove="handleRemoveConfig('table',element.id)" />
                   </template>
                   <template #footer>
-                    <th class="table-config-th action" scope="col">
+                    <th class="table-config-th action" :class="{'freeze': configs.general.isFixedAction}" scope="col">
                       <span>操作</span>
                     </th>
                   </template>
@@ -102,12 +102,12 @@
                 </thead>
                 <tbody>
                 <tr class="table-config-tr" v-for="(item,index) in 1">
-                  <td class="table-config-td" v-if="configs.general.isShowNum">{{ index + 1 }}</td>
+                  <td class="table-config-td num" :class="{'freeze': configs.general.isFixedNum}" v-if="configs.general.isShowNum">{{ index + 1 }}</td>
                   <td class="table-config-td" v-for="header in configs.table" :key="header.id"> {{
                       header.label
                     }}内容
                   </td>
-                  <td class="table-config-td">
+                  <td class="table-config-td action" :class="{'freeze': configs.general.isFixedAction}">
                     <n-space>
                       <n-button text type="info" class="btn" disabled>
                         编辑
@@ -161,7 +161,7 @@
                   表名[{{ getTableComment(item.general.tableName) }}]
                 </n-tooltip>
               </n-space>
-              <n-scrollbar x-scrollable style="max-width: calc(100vw - 690px)">
+              <n-scrollbar x-scrollable class="pb-3" style="max-width: calc(100vw - 690px)">
                 <table class="table-config">
                   <thead class="table-config-thead">
                   <draggable v-model="item.table"
@@ -176,7 +176,7 @@
                              item-key="id"
                   >
                     <template #header v-if="item.general.isShowNum">
-                      <th class="table-config-th num" scope="col">
+                      <th class="table-config-th num" :class="{'freeze': item.general.isFixedNum}" scope="col">
                         <span>序号</span>
                       </th>
                     </template>
@@ -188,7 +188,7 @@
                                        @remove="handleRemoveConfig('table',element.id)" />
                     </template>
                     <template #footer>
-                      <th class="table-config-th action" scope="col">
+                      <th class="table-config-th action" :class="{'freeze': item.general.isFixedAction}" scope="col">
                         <span>操作</span>
                       </th>
                     </template>
@@ -196,12 +196,12 @@
                   </thead>
                   <tbody>
                   <tr class="table-config-tr" v-for="(_,index) in 1">
-                    <td class="table-config-td" v-if="item.general.isShowNum">{{ index + 1 }}</td>
+                    <td class="table-config-td" :class="{'freeze': item.general.isFixedNum}" v-if="item.general.isShowNum">{{ index + 1 }}</td>
                     <td class="table-config-td" v-for="header in item.table" :key="header.id"> {{
                         header.label
                       }}内容
                     </td>
-                    <td class="table-config-td">
+                    <td class="table-config-td" :class="{'freeze': item.general.isFixedAction}">
                       <n-space>
                         <n-button text type="info" class="btn" disabled>
                           编辑
@@ -235,7 +235,6 @@
           </n-scrollbar>
         </n-card>
       </n-tab-pane>
-
       <n-tab-pane name="subform" tab="子表单配置" v-if="subTables.length>0">
         <n-card content-style="padding: 0;">
           <div v-if="subTablesFormTableName">
@@ -251,7 +250,7 @@
                 正在编辑的表[{{ getTableComment(subTablesFormTableName) }}]
               </n-tooltip>
             </div>
-            <n-scrollbar style="max-height: calc(100vh - 240px);">
+            <n-scrollbar style="max-height: calc(100vh - 250px);">
               <draggable
                   class="flex flex-wrap content-start pr-4 pt-5 min-h-52"
                   v-model="subTablesForm"
@@ -305,7 +304,6 @@
                       :table-name="editingTableName"
                       :table-columns="tableColumns" />
   </n-flex>
-  <attribute-config-drawer v-model="showAttrEdit" :attrs="attrs" :data="editAttr" @confirm="onEditAttrOk" />
   <add-sub-table-drawer v-model:show="addSubTableShow" v-model:tables="subTables" @confirm="addSubTable" />
 </template>
 
@@ -319,12 +317,11 @@ import FormConfigForm from '@/components/form/FormConfigForm.vue'
 import TableConfigForm from '@/components/table/TableConfigForm.vue'
 import SearchConfigForm from '@/components/search/SearchConfigForm.vue'
 import AddSubTableDrawer from '@/components/config/AddSubTableDrawer.vue'
-import AttributeConfigDrawer from '@/components/attr/AttributeConfigDrawer.vue'
 import SearchDragItem from '@/components/search/SearchDragItem.vue'
 import TableDragItem from '@/components/table/TableDragItem.vue'
 import FormDragItem from '@/components/form/FormDragItem.vue'
-import SearchDragableElement from '@/components/element/SearchDragableElement.vue'
-import FormDragableElement from '@/components/element/FormDragableElement.vue'
+import SearchDraggableElement from '@/components/element/SearchDraggableElement.vue'
+import FormDraggableElement from '@/components/element/FormDraggableElement.vue'
 import {getTableColumns, getTableComment} from '@/utils/Apis.js'
 
 const modelValue = defineModel()
@@ -494,41 +491,47 @@ onMounted(async() => {
   border-collapse: collapse;
   font-family: Arial, sans-serif;
   background-color: #f9f9f9;
-  border-radius: 2px;
+  border-radius: 4px;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
   margin-top: 25px;
   text-align: left;
   min-width: 100%;
+  table-layout: fixed;
+  outline: #ccc solid 1px;
 }
 
-.table-config-th .operations {
-  position: absolute;
-  right: 0;
-  top: 1px;
-  transform: translateY(-100%);
-  padding: 0 3px;
+.table-config tr,
+.table-config td,
+.table-config th{
+  outline: #ddd solid 1px;
+  border: 1px solid #ddd;
 }
-
-.table-config-th .operations {
-  visibility: hidden;
-}
-
-.table-config-th:hover .operations {
-  border: 1px dashed #ccc;
-  border-bottom: none;
-  visibility: visible;
-}
-
-.table-config-th.attr {
-  cursor: move;
-}
-
 .table-config-th.num {
   width: 56px;
 }
 
 .table-config-th.action {
   width: 120px;
+}
+
+.table-config-th.freeze {
+  background: #89b8e8;
+}
+
+.table-config-th.freeze,
+.table-config-td.freeze{
+  position: sticky;
+  z-index: 2;
+}
+
+.table-config-th.num.freeze,
+.table-config-td.num.freeze{
+  left: 0;
+}
+
+.table-config-th.action.freeze,
+.table-config-td.action.freeze{
+  right: 0;
 }
 
 .table-config-thead {
@@ -538,11 +541,11 @@ onMounted(async() => {
 
 .table-config-th {
   padding: 12px;
-  border: 1px solid #ddd;
   font-weight: bold;
   transition: background-color 0.3s;
   position: relative;
   min-width: 120px;
+  z-index: 1;
 }
 
 .table-config-th:hover {
@@ -555,9 +558,9 @@ onMounted(async() => {
 
 .table-config-td {
   padding: 12px;
-  border: 1px solid #ddd;
   background-color: #ffffff;
   transition: background-color 0.3s;
+  z-index: 98;
 }
 
 .table-config-tr:nth-child(even) .table-config-td {

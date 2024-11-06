@@ -3,7 +3,7 @@
     <template #header>
       <config-header title="通用配置" :config-type="configType" :table-name="tableName" />
     </template>
-    <n-scrollbar style="max-height: calc(100vh - 200px);padding-right: 16px;">
+    <n-scrollbar style="max-height: calc(100vh - 250px);padding-right: 16px;">
       <n-form
           ref="formRef"
           :model="formValue"
@@ -69,6 +69,26 @@
             <label-with-tooltip label="逻辑删除字段" tooltip="表里用来关联逻辑删除字段的字段" />
           </template>
           <n-select filterable v-model:value="formValue.logicDelField" :options="columns" />
+        </n-form-item>
+
+        <n-form-item path="isFixedNum">
+          <template #label>
+            <label-with-tooltip label="冻结序号列" tooltip="冻结序号列" />
+          </template>
+          <n-switch v-model:value="formValue.isFixedNum">
+            <template #checked>是</template>
+            <template #unchecked>否</template>
+          </n-switch>
+        </n-form-item>
+
+        <n-form-item path="isFixedAction" >
+          <template #label>
+            <label-with-tooltip label="冻结操作列" tooltip="冻结操作列" />
+          </template>
+          <n-switch v-model:value="formValue.isFixedAction">
+            <template #checked>是</template>
+            <template #unchecked>否</template>
+          </n-switch>
         </n-form-item>
       </n-form>
     </n-scrollbar>

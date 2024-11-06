@@ -14,7 +14,7 @@
       :pagination="false"
       :row-key="(row) => row.tableName"
       :row-props="rowProps"
-      max-height="calc(100vh - 240px)"
+      max-height="calc(100vh - 250px)"
   />
 </template>
 

@@ -3,7 +3,7 @@
     <template #header>
       <config-header title="表单项配置" :config-type="configType" :table-name="tableName" />
     </template>
-    <n-scrollbar style="max-height: calc(100vh - 200px);padding-right: 16px;">
+    <n-scrollbar style="max-height: calc(100vh - 250px);padding-right: 16px;">
       <n-form
           ref="formRef"
           :key="formValue.id"
@@ -32,13 +32,6 @@
 
         <n-form-item path="label" label="标签名">
           <n-input v-model:value="formValue.label" />
-        </n-form-item>
-
-        <n-form-item path="displayFull" label="占据整行">
-          <n-switch v-model:value="formValue.displayFull" :default-value="false">
-            <template #checked>是</template>
-            <template #unchecked>否</template>
-          </n-switch>
         </n-form-item>
 
         <n-form-item path="type" label="类型">
@@ -76,6 +69,12 @@
           </template>
           <n-input v-model:value="formValue.attachmentAllowType" />
         </n-form-item>
+        <n-form-item path="displayFull" label="占据整行">
+          <n-switch v-model:value="formValue.displayFull" :default-value="false">
+            <template #checked>是</template>
+            <template #unchecked>否</template>
+          </n-switch>
+        </n-form-item>
       </n-form>
     </n-scrollbar>
   </n-card>
@@ -90,8 +89,7 @@ import {toCamelCase} from '@/utils/StringUtils.js'
 import ConfigHeader from '@/components/common/ConfigHeader.vue'
 
 const props = defineProps({tableColumns: Array, configType: String, tableName: String})
-const columns = computed(() => props.tableColumns.map(
-    item => ({label: `${item.columnName}(${item.columnComment})`, value: item.columnName})))
+const columns = computed(() => props.tableColumns.map(item => ({label: `${item.columnName}(${item.columnComment})`, value: item.columnName,comment: item.columnComment})))
 const formValue = defineModel()
 
 const rules = {}
@@ -102,6 +100,7 @@ defineExpose({validate})
 
 const handleUpdateColumnName = (value, option) => {
   formValue.value.attrName = toCamelCase(value)
+  formValue.value.label = option.comment
 }
 </script>
 
