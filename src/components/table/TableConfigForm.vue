@@ -1,57 +1,81 @@
 <template>
-  <n-form
-      ref="formRef"
-      :key="formValue.id"
-      :model="formValue"
-      :rules="rules"
-      label-placement="top"
-      require-mark-placement="right-hanging"
-  >
-    <n-form-item path="columnName" label="对应字段">
-      <n-input v-model:value="formValue.columnName" disabled />
-    </n-form-item>
+  <n-card class="attr-config">
+    <template #header>
+      <config-header title="列表项配置" :config-type="configType" :table-name="tableName" />
+    </template>
+    <n-scrollbar style="max-height: calc(100vh - 200px);padding-right: 16px;">
+      <n-form
+          ref="formRef"
+          :key="formValue.id"
+          :model="formValue"
+          :rules="rules"
+          label-placement="top"
+          require-mark-placement="right-hanging"
+      >
+        <n-form-item path="columnName">
+          <template #label>
+            <label-with-tooltip label="对应字段" tooltip="列表项对应的字段，用来关联生成查询SQL所用字段" />
+          </template>
+          <n-select filterable
+                    v-model:value="formValue.columnName"
+                    :options="columns"
+                    clearable
+                    @update:value="handleUpdateColumnName" />
+        </n-form-item>
 
-    <n-form-item path="attrName" label="属性名">
-      <n-input v-model:value="formValue.attrName" />
-    </n-form-item>
+        <n-form-item path="attrName">
+          <template #label>
+            <label-with-tooltip label="属性名" tooltip="JSON中的参数名" />
+          </template>
+          <n-input v-model:value="formValue.attrName" />
+        </n-form-item>
 
-    <n-form-item path="label" label="标签名">
-      <n-input v-model:value="formValue.label" />
-    </n-form-item>
+        <n-form-item path="label" label="标签名">
+          <n-input v-model:value="formValue.label" />
+        </n-form-item>
 
-    <n-form-item path="type" label="类型">
-      <n-select v-model:value="formValue.type" :options="options" />
-    </n-form-item>
+        <n-form-item path="type" label="类型">
+          <n-select v-model:value="formValue.type" :options="tableElements" />
+        </n-form-item>
 
-    <n-form-item path="width" label="宽度">
-      <n-input v-model:value="formValue.width" />
-    </n-form-item>
+        <n-form-item path="width" label="宽度">
+          <n-input v-model:value="formValue.width" />
+        </n-form-item>
 
-    <n-form-item path="dictCode" label="字典编码" v-if="formValue.type === 'dict'">
-      <n-input v-model:value="formValue.dictCode" />
-    </n-form-item>
+        <n-form-item path="dictCode" label="字典编码" v-if="formValue.type === 'dict'">
+          <n-input v-model:value="formValue.dictCode" />
+        </n-form-item>
 
-    <n-form-item path="dateFormat" label="日期格式" v-if="formValue.type === 'date'">
-      <n-input v-model:value="formValue.dateFormat" default-value="YYYY-MM-DD" />
-    </n-form-item>
-  </n-form>
+        <n-form-item path="dateFormat" label="日期格式" v-if="formValue.type === 'date'">
+          <n-input v-model:value="formValue.dateFormat" default-value="YYYY-MM-DD" />
+        </n-form-item>
+      </n-form>
+    </n-scrollbar>
+  </n-card>
+
 </template>
 
 <script setup>
 
-const formValue = defineModel()
+import LabelWithTooltip from '@/components/tool/LabelWithTooltip.vue'
+import {tableElements} from '@/utils/Constants.js'
+import {toCamelCase} from '@/utils/StringUtils.js'
+import ConfigHeader from '@/components/common/ConfigHeader.vue'
 
-const options = [
-  {label: '文本', value: 'string'},
-  {label: '日期', value: 'date'},
-  {label: '字典', value: 'dict'},
-]
+const props = defineProps({tableColumns: Array, configType: String, tableName: String})
+const columns = computed(() => props.tableColumns.map(
+    item => ({label: `${item.columnName}(${item.columnComment})`, value: item.columnName})))
+const formValue = defineModel()
 
 const rules = {}
 
 const formRef = ref()
 const validate = (callback) => formRef.value.validate(callback)
 defineExpose({validate})
+
+const handleUpdateColumnName = (value, option) => {
+  formValue.value.attrName = toCamelCase(value)
+}
 </script>
 
 <style scoped>

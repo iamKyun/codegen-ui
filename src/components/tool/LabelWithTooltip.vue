@@ -13,7 +13,6 @@
 </template>
 
 <script setup>
-import {defineProps} from 'vue'
 import {NIcon, NTooltip} from 'naive-ui'
 import {HelpCircleOutline} from '@vicons/ionicons5'
 

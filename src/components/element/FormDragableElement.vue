@@ -1,8 +1,8 @@
 <template>
   <draggable
       :sort="false"
-      :list="searchElements"
-      :group="{ name: 'search', pull: 'clone', put: false, sort:false }"
+      :list="formElements"
+      :group="{ name: 'form', pull: 'clone', put: false, sort:false }"
       :clone="clone"
       item-key="type"
       class="element-selection"
@@ -19,7 +19,7 @@
 <script setup>
 import draggable from 'vuedraggable'
 import {uuidv4} from '@/utils/StringUtils.js'
-import {searchElements} from '@/utils/Constants.js'
+import {formElements} from '@/utils/Constants.js'
 
 const clone = (item) => {
   console.log(item)

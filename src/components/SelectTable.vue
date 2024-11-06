@@ -19,9 +19,8 @@
 </template>
 
 <script setup>
-import {onMounted,defineProps} from 'vue'
 import {Search} from '@vicons/ionicons5'
-import axios from 'axios'
+import {getTables} from '@/utils/Apis.js'
 
 const props = defineProps(
     {multiple: {type: Boolean, default: false}}
@@ -74,9 +73,7 @@ const rowProps = (row) => {
 }
 
 onMounted(async() => {
-  const res = await axios.get('/api/tables')
-  console.log(res)
-  data.value = res.data
+  data.value = await getTables()
 })
 </script>
 

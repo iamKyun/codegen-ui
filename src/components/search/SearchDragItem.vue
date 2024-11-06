@@ -11,7 +11,7 @@
         <span> :</span>
       </n-flex>
       <div class="flex-1">
-        <n-input v-if="element.type==='input'" placeholder="文本搜索" size="medium" disabled />
+        <n-input v-if="element.type==='text'" placeholder="文本搜索" size="medium" disabled />
         <n-space v-if="element.type==='number' && !!element.rangeSearch" justify="center" :wrap="false">
           <n-input-number disabled placeholder="" />
           <span>~</span>
@@ -51,6 +51,7 @@
 <script setup>
 
 import {NButton} from 'naive-ui'
+import {exampleOptions} from '@/utils/Constants.js'
 
 const props = defineProps({
   element: Object,
@@ -58,17 +59,6 @@ const props = defineProps({
   editingId: String,
 })
 const emit = defineEmits(['config', 'remove'])
-
-const exampleOptions = [
-  {
-    label: '选项一',
-    value: '1',
-  },
-  {
-    label: '选项二',
-    value: '2',
-  },
-]
 
 function config() {
   emit('config')
