@@ -4,8 +4,9 @@
                               'full': !!element.displayFull,
                               'editing': configType === 'search' && element.id===editingId,
                        }"
+          @click="config"
   >
-    <n-flex :wrap="false" align="center" justify="flex-start" class="w-full h-full">
+    <n-flex :wrap="false" align="center" justify="flex-start" class="content w-full h-full">
       <n-flex :wrap="false" align="center" justify="space-between"  class="w-20 h-full">
         <span>{{ element.label }}</span>
         <span> :</span>
@@ -45,6 +46,7 @@
         </n-button>
       </n-space>
     </div>
+    <div class="overlay"></div>
   </n-flex>
 </template>
 
@@ -75,7 +77,7 @@ function handleRemoveConfig() {
   box-sizing: border-box;
   padding: 10px;
   margin: 5px;
-  cursor: move;
+  cursor: pointer;
   border: 1px dashed #ffff;
   position: relative;
 }
@@ -109,5 +111,21 @@ function handleRemoveConfig() {
 
 .search-form-item.editing {
   border: 1px dashed #d93636;
+}
+
+.content {
+  position: relative;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0); /* 半透明蒙版 */
+  pointer-events: auto;
 }
 </style>

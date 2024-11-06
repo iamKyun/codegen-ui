@@ -1,7 +1,8 @@
 <template>
   <th class="table-config-th attr"
       :class="{ 'editing': configType === 'table' && element.id===editingId, }"
-      scope="col">
+      scope="col"
+      @click="config">
     <div>
       <span>{{ element.label }}</span>
       <div class="operations">
@@ -39,5 +40,7 @@ function handleRemoveConfig() {
 </script>
 
 <style scoped>
-
+.table-config-th {
+  cursor: pointer;
+}
 </style>
