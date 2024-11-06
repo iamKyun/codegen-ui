@@ -383,19 +383,6 @@ const config = (type, item = null, table = null) => {
   console.log('config', type, item, editingId.value)
 }
 
-const showAttrEdit = ref(false)
-const editAttr = ref(null)
-
-const onEditAttrOk = (attr) => {
-  console.log(attr)
-  if (!attr.id) {
-    attrs.value.push({id: uuidv4(), ...attr})
-  } else {
-    const index = attrs.value.findIndex(item => item.id === attr.id)
-    attrs.value.splice(index, 1, {...attr})
-  }
-}
-
 const handleRemoveConfig = (type, id, tableName = null) => {
   if (type === 'subTablesTable') {
     const arr = configs.value.subTables.find(t => t.general.tableName === tableName).table
