@@ -44,7 +44,7 @@
           <n-select v-model:value="formValue.type" :options="searchElements" />
         </n-form-item>
 
-        <n-form-item path="fuzzySearch" label="模糊搜索" v-if="formValue.type==='input'">
+        <n-form-item path="fuzzySearch" label="模糊搜索" v-if="formValue.type==='text'">
           <n-switch v-model:value="formValue.fuzzySearch" :default-value="true">
             <template #checked>是</template>
             <template #unchecked>否</template>
