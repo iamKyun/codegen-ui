@@ -6,8 +6,7 @@
         <n-flex justify="center" align="center" gap="middle">
           <n-button type="primary" @click="nextStep" v-show="curStep !== 'configPage'"
             :disabled="curStepCount >= steps.length - 1">下一步</n-button>
-          <n-button type="primary" @click="generate" v-show="curStep === 'configPage'"
-            @loading="generating">生成代码</n-button>
+          <n-button type="primary" @click="generateConfigShow = true" v-show="curStep === 'configPage'">生成代码</n-button>
           <n-button @click="previousStep" :disabled="curStepCount < 1">上一步</n-button>
         </n-flex>
       </n-flex>
@@ -17,6 +16,7 @@
       <select-table v-if="curStep === 'selectMainTable'" :multiple="false" v-model="selectedMainTables" />
       <config-page v-if="curStep === 'configPage'" v-model="pageConfig" />
     </n-layout-content>
+    <generate-config-modal v-model:show="generateConfigShow" v-model:config="pageConfig" />
   </n-layout>
 </template>
 
@@ -26,6 +26,7 @@ import SelectMode from '@/components/SelectMode.vue'
 import { useMessage } from 'naive-ui'
 import SelectTable from '@/components/SelectTable.vue'
 import ConfigPage from '@/components/ConfigPage.vue'
+import GenerateConfigModal from '@/components/config/GenerateConfigModal.vue'
 
 const message = useMessage()
 const curStep = ref('selectMode')
@@ -41,13 +42,14 @@ const modeSteps = {
 }
 const steps = ref(modeSteps.design)
 const curStepText = computed(() => stepText[curStep.value])
-const generating = ref(false)
-
+// 生成代码弹窗
+const generateConfigShow = ref(false)
 // 各阶段数据
 const selectedMode = ref('design')
 const selectedMainTables = ref([])
 const mainTableConfig = ref({})
 const pageConfig = ref({})
+
 
 const nextStep = () => {
   switch (curStep.value) {
@@ -106,21 +108,6 @@ const nextStep = () => {
 
 const previousStep = () => {
   curStep.value = steps.value[--curStepCount.value]
-}
-
-const generate = () => {
-  console.log('页面配置:', pageConfig.value)
-  generating.value = true
-  generate(pageConfig.value)
-    .then(res => {
-      message.success('生成成功')
-    })
-    .catch(err => {
-      message.error('生成失败')
-    })
-    .finally(() => {
-      generating.value = false
-    })
 }
 
 
