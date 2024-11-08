@@ -14,15 +14,13 @@
 
 <script setup>
 import pic1 from '@/assets/1.png';
-import pic2 from '@/assets/2.png';
 import pic3 from '@/assets/3.png';
 
 const model = defineModel()
 
 const modeOptions = [
-  {value: 'single', label: '单表', src: pic1},
-  {value: 'oneToMany', label: '一对多', src: pic2},
-  {value: 'entity', label: '仅实体类', src: pic3},
+  {value: 'design', label: '页面设计', src: pic1},
+  {value: 'entity', label: '仅Java类', src: pic3},
 ]
 
 function selectMode(value) {
@@ -67,8 +65,8 @@ function selectMode(value) {
 }
 
 .option-image {
-  width: 130px;
-  height: 130px;
+  width: auto;
+  height: 100px;
   object-fit: cover;
 }
 </style>

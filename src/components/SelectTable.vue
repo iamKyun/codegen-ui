@@ -35,7 +35,7 @@ const computedData = computed(() => {
   return data.value.filter(
       (item) =>
           item.tableName.includes(searchText.value)
-          || item.tableComment.includes(searchText.value))
+          || (item.tableComment && item.tableComment.includes(searchText.value)))
 })
 const columns = [
   {

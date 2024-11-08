@@ -18,6 +18,12 @@ export async function getTableColumns(tableName) {
   })
 }
 
+export async function generate(data) {
+  return await axios.get('/api/generate', {
+    data,
+  })
+}
+
 export function getTableComment(tableName) {
   if (tables.length > 0) {
     console.log('tables not empty')

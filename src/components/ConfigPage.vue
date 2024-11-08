@@ -81,7 +81,7 @@
                            ghostClass="ghost"
                            item-key="id"
                 >
-                  <template #header v-if="configs.general.isShowNum">
+                  <template #header v-if="configs.general.isShowNum !== false">
                     <th class="table-config-th num" :class="{'freeze': configs.general.isFixedNum}" scope="col">
                       <span>序号</span>
                     </th>
@@ -102,7 +102,7 @@
                 </thead>
                 <tbody>
                 <tr class="table-config-tr" v-for="(item,index) in 1">
-                  <td class="table-config-td num" :class="{'freeze': configs.general.isFixedNum}" v-if="configs.general.isShowNum">{{ index + 1 }}</td>
+                  <td class="table-config-td num" :class="{'freeze': configs.general.isFixedNum}" v-if="configs.general.isShowNum !== false">{{ index + 1 }}</td>
                   <td class="table-config-td" v-for="header in configs.table" :key="header.id"> {{
                       header.label
                     }}内容
@@ -175,7 +175,7 @@
                              ghostClass="ghost"
                              item-key="id"
                   >
-                    <template #header v-if="item.general.isShowNum">
+                    <template #header v-if="item.general.isShowNum !== false">
                       <th class="table-config-th num" :class="{'freeze': item.general.isFixedNum}" scope="col">
                         <span>序号</span>
                       </th>
@@ -196,7 +196,7 @@
                   </thead>
                   <tbody>
                   <tr class="table-config-tr" v-for="(_,index) in 1">
-                    <td class="table-config-td" :class="{'freeze': item.general.isFixedNum}" v-if="item.general.isShowNum">{{ index + 1 }}</td>
+                    <td class="table-config-td" :class="{'freeze': item.general.isFixedNum}" v-if="item.general.isShowNum !== false">{{ index + 1 }}</td>
                     <td class="table-config-td" v-for="header in item.table" :key="header.id"> {{
                         header.label
                       }}内容
@@ -324,7 +324,7 @@ import SearchDraggableElement from '@/components/element/SearchDraggableElement.
 import FormDraggableElement from '@/components/element/FormDraggableElement.vue'
 import {getTableColumns, getTableComment} from '@/utils/Apis.js'
 
-const modelValue = defineModel()
+const configs = defineModel()
 const message = useMessage()
 const drag = ref(false)
 
@@ -332,15 +332,6 @@ const editingTableName = ref()
 const tableColumnsList = ref([])
 const tableColumns = ref([])
 const attrs = ref([])
-
-// 配置
-const configs = ref({
-  general: {},
-  search: [],
-  table: [],
-  form: [],
-  subTables: [],
-})
 
 const generalConfig = ref({})
 const searchConfig = ref({})
@@ -351,10 +342,22 @@ const configType = ref('general')
 const editingId = ref(null)
 const subTablesFormTableName = ref(null)
 const subTablesForm = ref([])
+// 同步更改
 watch(subTablesForm, (val) => {
-  console.log('subTablesForm', val)
   configs.value.subTables.find(i => i.general.tableName === subTablesFormTableName.value).form = val
-})
+}, { deep: true })
+// 同步更改
+watch(generalConfig, (val) => {
+  if (configType.value === 'general') {
+    configs.value.general = val
+  } else if (configType.value === 'subTablesGeneral') {
+    const subTable = configs.value.subTables.find(i => i.general.tableName === subTablesFormTableName.value)
+    if (subTable) {
+      subTable.general = val
+    }
+  }
+}, { deep: true })
+
 
 const config = (type, item = null, table = null) => {
   configType.value = type
@@ -428,19 +431,21 @@ const handleAddAttr = (table) => {
   table.push({
     id: uuidv4(),
     type: 'text',
-    label: '属性名',
+    label: '属性名' + Math.floor(Math.random() * 1000),
+    attrName: 'attrName' + Math.floor(Math.random() * 1000),
   })
 }
 
 onMounted(async() => {
-  const res = await getTableColumns(modelValue.value.tableName)
+  const tableName = configs.value.general.tableName
+  const res = await getTableColumns(tableName)
   const columns = res.data
-  tableColumnsList.value = [{tableName: modelValue.value.tableName, columns: [...columns]}]
+  tableColumnsList.value = [{tableName: tableName, columns: [...columns]}]
   tableColumns.value = [...columns]
-  editingTableName.value = modelValue.value.tableName
+  editingTableName.value = tableName
   configs.value = {
     general: {
-      tableName: modelValue.value.tableName,
+      tableName: tableName,
       isShowNum: true,
     },
     search: [],
@@ -449,7 +454,6 @@ onMounted(async() => {
     subTables: [],
   }
   generalConfig.value = configs.value.general
-
 })
 </script>
 
