@@ -1,34 +1,39 @@
-import axios from 'axios'
+import axios from "axios";
 
-let tables = []
+// 创建 axios 实例
+const instance = axios.create();
 
-export async function getTables() {
-  if (tables.length > 0) {
-    console.log('table cached')
-    return tables
+// 响应拦截器
+instance.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    // 处理错误响应
+    const errorMsg = error.response?.data || error.message || "请求失败";
+    window.$message.error(errorMsg);
+    return Promise.reject(error);
   }
-  const response = await axios.get('/api/tables')
-  tables = response.data // 缓存请求结果
-  return tables
+);
+
+export function getTables() {
+  return instance.get("/api/tables");
 }
 
-export async function getTableColumns(tableName) {
-  return await axios.get('/api/columns', {
-    params: {tableName: tableName},
-  })
+export function getTable(tableName) {
+  return instance.get("/api/table", {
+    params: { tableName: tableName },
+  });
 }
 
-export async function generate(data) {
-  return await axios.get('/api/generate', {
-    data,
-  })
+export function getTableColumns(tableName) {
+  return instance.get("/api/columns", {
+    params: { tableName: tableName },
+  });
 }
 
-export function getTableComment(tableName) {
-  if (tables.length > 0) {
-    console.log('tables not empty')
-    return tables.find(item => item.tableName === tableName).tableComment
-  }
-  console.log('tables empty')
-  return null
+export function generate(data) {
+  return instance.post("/api/generate", data);
+}
+
+export function download(zip) {
+  window.open(`/api/download?zip=${zip}`);
 }

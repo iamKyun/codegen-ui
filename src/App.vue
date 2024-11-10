@@ -7,10 +7,8 @@
 </template>
 
 <script setup>
-import Index from './components/Index.vue'
-import { zhCN, dateZhCN } from 'naive-ui'
-
+import Index from "./components/Index.vue";
+import { zhCN, dateZhCN } from "naive-ui";
 </script>
 
-<style scoped>
-</style>
+<style scoped></style>

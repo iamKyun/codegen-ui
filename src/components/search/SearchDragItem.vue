@@ -1,46 +1,75 @@
 <template>
-  <n-flex class="search-form-item w-full h-full"
-          :class="{
-                              'full': !!element.displayFull,
-                              'editing': configType === 'search' && element.id===editingId,
-                       }"
-          @click="config"
+  <n-flex
+    class="search-form-item w-full h-full"
+    :class="{
+      full: !!element.displayFull,
+      editing: configType === 'search' && element.id === editingId,
+    }"
+    @click="config"
   >
-    <n-flex :wrap="false" align="center" justify="flex-start" class="content w-full h-full">
-      <n-flex :wrap="false" align="center" justify="space-between"  class="w-20 h-full">
+    <n-flex
+      :wrap="false"
+      align="center"
+      justify="flex-start"
+      class="content w-full h-full"
+    >
+      <n-flex
+        :wrap="false"
+        align="center"
+        justify="space-between"
+        class="w-20 h-full"
+      >
         <span>{{ element.label }}</span>
         <span> :</span>
       </n-flex>
       <div class="flex-1">
-        <n-input v-if="element.type==='text'" placeholder="文本搜索" size="medium" disabled />
-        <n-space v-if="element.type==='number' && !!element.rangeSearch" justify="center" :wrap="false">
+        <n-input
+          v-if="element.type === 'text'"
+          placeholder="文本搜索"
+          size="medium"
+          disabled
+        />
+        <n-space
+          v-if="element.type === 'number' && element.rangeSearch !== false"
+          justify="center"
+          :wrap="false"
+        >
           <n-input-number disabled placeholder="" />
           <span>~</span>
           <n-input-number disabled placeholder="" />
         </n-space>
-        <n-input-number v-if="element.type==='number' && !element.rangeSearch"
-                        disabled
-                        placeholder="数字搜索" />
-        <n-date-picker v-if="element.type==='date'"
-                       disabled
-                       :type="element.rangeSearch?'datetimerange':'date'" />
-        <div v-if="element.type==='radio'">
-          <n-radio v-for="i in exampleOptions" :key="i.value" :value="i.value" disabled>
+        <n-input-number
+          v-if="element.type === 'number' && !(element.rangeSearch !== false)"
+          disabled
+          placeholder="数字搜索"
+        />
+        <n-date-picker
+          v-if="element.type === 'date'"
+          disabled
+          :type="element.rangeSearch !== false ? 'datetimerange' : 'date'"
+        />
+        <div v-if="element.type === 'radio'">
+          <n-radio
+            v-for="i in exampleOptions"
+            :key="i.value"
+            :value="i.value"
+            disabled
+          >
             {{ i.label }}
           </n-radio>
         </div>
-        <n-select v-if="element.type==='select'"
-                  value-field="key"
-                  label-field="value"
-                  placeholder="下拉选择"
-                  disabled />
+        <n-select
+          v-if="element.type === 'select'"
+          value-field="key"
+          label-field="value"
+          placeholder="下拉选择"
+          disabled
+        />
       </div>
     </n-flex>
     <div class="operations">
       <n-space>
-        <n-button text type="info" class="btn" @click="config">
-          配置
-        </n-button>
+        <n-button text type="info" class="btn" @click="config"> 配置 </n-button>
         <n-button text type="error" class="btn" @click="handleRemoveConfig">
           删除
         </n-button>
@@ -51,23 +80,22 @@
 </template>
 
 <script setup>
-
-import {NButton} from 'naive-ui'
-import {exampleOptions} from '@/utils/Constants.js'
+import { NButton } from "naive-ui";
+import { exampleOptions } from "@/utils/Constants.js";
 
 const props = defineProps({
   element: Object,
   configType: String,
   editingId: String,
-})
-const emit = defineEmits(['config', 'remove'])
+});
+const emit = defineEmits(["config", "remove"]);
 
 function config() {
-  emit('config')
+  emit("config");
 }
 
 function handleRemoveConfig() {
-  emit('remove')
+  emit("remove");
 }
 </script>
 
