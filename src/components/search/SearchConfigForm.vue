@@ -145,8 +145,16 @@ const columns = computed(() =>
 );
 const formValue = defineModel();
 
-const rules = {};
-
+const rules = {
+  attrName: {
+    required: true,
+    message: "属性名不能为空",
+  },
+  label: {
+    required: true,
+    message: "标签名不能为空",
+  },
+};
 const formRef = ref();
 const validate = (callback) => formRef.value.validate(callback);
 defineExpose({ validate });

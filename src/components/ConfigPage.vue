@@ -44,7 +44,7 @@
       <n-tab-pane name="table" tab="列表配置">
         <n-scrollbar style="max-height: calc(100vh - 200px)">
           <n-flex>
-            <n-card title="搜索条件">
+            <n-card title="搜索条件" content-style="padding-bottom: 0;">
               <draggable
                 class="flex flex-wrap draggable-area"
                 v-model="configs.search"
@@ -69,6 +69,17 @@
                     @config="config('search', element)"
                     @remove="handleRemoveConfig('search', element.id)"
                   />
+                </template>
+                <template #footer>
+                  <div v-if="configs.search.length === 0" class="empty-tip">
+                    <n-empty description="拖动左侧组件到此处" size="small">
+                      <template #icon>
+                        <n-icon>
+                          <arrow-forward />
+                        </n-icon>
+                      </template>
+                    </n-empty>
+                  </div>
                 </template>
               </draggable>
             </n-card>
@@ -196,6 +207,17 @@
                   @config="config('form', element)"
                   @remove="handleRemoveConfig('form', element.id)"
                 />
+              </template>
+              <template #footer>
+                <div v-if="configs.form.length === 0" class="empty-tip">
+                  <n-empty description="拖动左侧组件到此处" size="small">
+                    <template #icon>
+                      <n-icon>
+                        <arrow-forward />
+                      </n-icon>
+                    </template>
+                  </n-empty>
+                </div>
               </template>
             </draggable>
             <div
@@ -375,9 +397,22 @@
                     :element="element"
                     config-type="form"
                     :editing-id="editingId"
-                    @config="config('subTablesForm', element)"
+                    @config="
+                      config('subTablesForm', element, subTablesFormTableName)
+                    "
                     @remove="handleRemoveConfig('subTablesForm', element.id)"
                   />
+                </template>
+                <template #footer>
+                  <div v-if="subTablesForm.length === 0" class="empty-tip">
+                    <n-empty description="拖动左侧组件到此处" size="small">
+                      <template #icon>
+                        <n-icon>
+                          <arrow-forward />
+                        </n-icon>
+                      </template>
+                    </n-empty>
+                  </div>
                 </template>
               </draggable>
             </n-scrollbar>
@@ -430,7 +465,7 @@
 
 <script setup>
 import { NButton, NIcon, useMessage } from "naive-ui";
-import { Add, Cog } from "@vicons/ionicons5";
+import { Add, Cog, ArrowForward } from "@vicons/ionicons5";
 import { uuidv4 } from "@/utils/StringUtils.js";
 import draggable from "vuedraggable";
 import GeneralConfigForm from "@/components/config/GeneralConfigForm.vue";
@@ -503,6 +538,8 @@ const config = (type, item = null, table = null) => {
     subTablesFormTableName.value = item.general.tableName;
   } else if (type === "general") {
     generalConfig.value = configs.value.general;
+    editingTableName.value = configs.value.general.tableName;
+  } else {
   }
   if (table) {
     editingTableName.value = table;
@@ -512,12 +549,12 @@ const config = (type, item = null, table = null) => {
   tableColumns.value = tableColumnsList.value.find(
     (i) => i.tableName === editingTableName.value
   ).columns;
+  console.log(editingTableName.value);
   if (item) {
     editingId.value = item.id;
   } else {
     editingId.value = null;
   }
-  console.log("config", type, item, editingId.value);
 };
 
 const handleRemoveConfig = (type, id, tableName = null) => {
@@ -761,5 +798,17 @@ onMounted(() => {
 
 .draggable-area {
   min-height: 52px;
+  padding-bottom: 30px;
+}
+
+.empty-tip {
+  width: 100%;
+  min-height: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px dashed #e5e7eb;
+  border-radius: 6px;
+  margin: 8px 0;
 }
 </style>
