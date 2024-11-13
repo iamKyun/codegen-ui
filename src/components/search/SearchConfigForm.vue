@@ -165,6 +165,7 @@ const handleUpdateColumnName = (value, option) => {
   formValue.value.label = option.comment;
   formValue.value.columnDataType = option.dataType;
   formValue.value.columnKey = option.key;
+  formValue.value.dataLength = option.dataLength;
 };
 </script>
 
