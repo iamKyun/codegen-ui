@@ -146,6 +146,7 @@ const columns = computed(() =>
     value: item.columnName,
     comment: item.columnComment,
     dataType: item.dataType,
+    dataLength: item.dataLength,
     key: item.key,
   }))
 );
